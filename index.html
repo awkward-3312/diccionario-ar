@@ -47,7 +47,6 @@
 
     .naranja { background-color: #ff6a00; }
     .rojo { color: #ff5c39; }
-    .verde { color: #2ecc71; }
     .azul { color: #1877f2; }
 
     h1 {
@@ -163,13 +162,23 @@
       }
 
       const datos = glosario[claveEncontrada];
+
+      if (datos.categoria && datos.categoria.toLowerCase() === "abreviatura") {
+        resultado.innerHTML = `
+          <div class="titulo-resultado">${claveEncontrada}</div>
+          <strong>Definición:</strong><br>${datos.definicion}
+        `;
+        return;
+      }
+
       resultado.innerHTML = `
         <div class="titulo-resultado">${claveEncontrada}</div>
         <strong>Traducción:</strong> ${datos.traduccion}<br>
-        <strong>Pronunciación:</strong> /${datos.pronunciacion}/<br>
+        <strong>Pronunciación:</strong> ${datos.pronunciacion ? `/${datos.pronunciacion}/` : "-"}<br>
         <strong>Categoría:</strong> ${datos.categoria}<br>
         <strong>Definición:</strong><br>${datos.definicion}<br>
-        <strong>Sinónimos:</strong><br><div class="sinonimos">
+        <strong>Sinónimos:</strong><br>
+        <div class="sinonimos">
           ${datos.sinonimos.map(s => `<span>${s}</span>`).join(" ")}
         </div>
       `;
