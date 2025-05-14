@@ -216,8 +216,8 @@
       <option value="termino">Término completo</option>
       <option value="forma">Forma farmacéutica</option>
     </select>
-    <input type="text" name="nombre" id="nombre" placeholder="Nombre del término" required>
-    <textarea name="definicion" id="definicion" placeholder="Definición" required></textarea>
+    <input type="text" name="nombre" id="nombre" placeholder="Nombre del término" required style="display: none;">
+<textarea name="definicion" id="definicion" placeholder="Definición" required></textarea>
     <input type="text" name="ingles" id="ingles" placeholder="Traducción">
     <input type="text" name="pronunciacion" id="pronunciacion" placeholder="Pronunciación">
     <input type="text" name="categoria" id="categoria" placeholder="Categoría gramatical">
@@ -246,12 +246,18 @@
 }
 
   function mostrarCampos(tipo) {
-    document.getElementById("ingles").style.display = tipo === "termino" ? "block" : "none";
-    document.getElementById("pronunciacion").style.display = tipo === "termino" ? "block" : "none";
-    document.getElementById("categoria").style.display = tipo === "termino" ? "block" : "none";
-    document.getElementById("sinonimos").style.display = tipo === "termino" ? "block" : "none";
-    document.getElementById("tipoForma").style.display = tipo === "forma" ? "block" : "none";
-  }
+  const mostrarDetalles = tipo === "termino";
+  const mostrarAbrev = tipo === "abreviatura";
+  const mostrarForma = tipo === "forma";
+
+  document.getElementById("ingles").style.display = mostrarDetalles ? "block" : "none";
+  document.getElementById("pronunciacion").style.display = mostrarDetalles ? "block" : "none";
+  document.getElementById("categoria").style.display = mostrarDetalles ? "block" : "none";
+  document.getElementById("sinonimos").style.display = mostrarDetalles ? "block" : "none";
+  document.getElementById("tipoForma").style.display = mostrarForma ? "block" : "none";
+  document.getElementById("nombre").style.display = mostrarForma || mostrarAbrev ? "block" : "none";
+  document.getElementById("definicion").style.display = tipo ? "block" : "none";
+}
 
   function mostrarConfirmacion() {
     const popup = document.getElementById("mensaje-popup");
