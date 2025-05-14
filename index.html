@@ -271,66 +271,66 @@
     }
 
     function guardarTermino() {
-      const tipo = document.getElementById("tipo").value;
-      const nombre = document.getElementById("nombre").value.trim().toUpperCase();
-      const definicion = document.getElementById("definicion").value.trim();
-      const traduccion = document.getElementById("traduccion").value.trim();
-      const pronunciacion = document.getElementById("pronunciacion").value.trim();
-      const categoria = document.getElementById("categoria").value.trim();
-      const sinonimos = document.getElementById("sinonimos").value;
-      const tipoForma = document.getElementById("tipoForma").value.trim();
+  const tipo = document.getElementById("tipo").value;
+  const nombre = document.getElementById("nombre").value.trim().toUpperCase();
+  const definicion = document.getElementById("definicion").value.trim();
+  const traduccion = document.getElementById("traduccion").value.trim();
+  const pronunciacion = document.getElementById("pronunciacion").value.trim();
+  const categoria = document.getElementById("categoria").value.trim();
+  const sinonimos = document.getElementById("sinonimos").value;
+  const tipoForma = document.getElementById("tipoForma").value.trim();
 
-      if (!nombre || !definicion) {
-        alert("Por favor completa al menos el nombre y la definición.");
-        return;
-      }
+  if (!nombre || !definicion) {
+    alert("Por favor completa al menos el nombre y la definición.");
+    return;
+  }
 
-      let datos = { tipo: tipo };
+  let datos = { tipo: tipo };
 
-      if (tipo === "termino") {
-        datos.espanol = nombre;
-        datos.ingles = traduccion;
-        datos.pronunciacion = pronunciacion;
-        datos.categoria = categoria;
-        datos.definicion = definicion;
-        datos.sinonimos = sinonimos;
+  if (tipo === "termino") {
+    datos.espanol = nombre;
+    datos.ingles = traduccion;
+    datos.pronunciacion = pronunciacion;
+    datos.categoria = categoria;
+    datos.definicion = definicion;
+    datos.sinonimos = sinonimos;
 
-      } else if (tipo === "abreviatura") {
-        datos.abreviatura = nombre;
-        datos.definicion = definicion;
+  } else if (tipo === "abreviatura") {
+    datos.abreviatura = nombre;
+    datos.definicion = definicion;
 
-      } else if (tipo === "forma") {
-        datos.forma = nombre;
-        datos.definicion = definicion;
-      }
+  } else if (tipo === "forma") {
+    datos.forma = nombre;
+    datos.definicion = definicion;
+  }
 
-      fetch("https://script.google.com/macros/s/AKfycby_wYRJj_KwVKTdqwCjWhjrWGtqiqjWUSRZVCHsRNeChL4xXIwKf9p90annTbcVntEbzg/exec", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(datos)
-      })
-        .then(res => res.text())
-        .then(response => {
-          alert("Término enviado a la hoja correctamente ✅");
+  fetch("https://script.google.com/macros/s/AKfycbyujU7RW0_n1jvIb9cMoIJiBW83MGOZRuCHOoVeAx5HjovHfq3sUntqq6At2uRxP42auQ/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(datos)
+  })
+    .then(res => res.text())
+    .then(response => {
+      alert("Término enviado a la hoja correctamente ✅");
 
-          // Limpiar campos
-          document.getElementById("nombre").value = "";
-          document.getElementById("definicion").value = "";
-          document.getElementById("traduccion").value = "";
-          document.getElementById("pronunciacion").value = "";
-          document.getElementById("categoria").value = "";
-          document.getElementById("sinonimos").value = "";
-          document.getElementById("tipoForma").value = "";
+      // Limpiar campos
+      document.getElementById("nombre").value = "";
+      document.getElementById("definicion").value = "";
+      document.getElementById("traduccion").value = "";
+      document.getElementById("pronunciacion").value = "";
+      document.getElementById("categoria").value = "";
+      document.getElementById("sinonimos").value = "";
+      document.getElementById("tipoForma").value = "";
 
-          cerrarFormulario();
-        })
-        .catch(error => {
-          alert("Error al enviar el término ❌");
-          console.error(error);
-        });
-    }
+      cerrarFormulario();
+    })
+    .catch(error => {
+      alert("Error al enviar el término ❌");
+      console.error(error);
+    });
+}
   </script>
 </body>
 </html>
