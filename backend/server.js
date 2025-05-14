@@ -18,6 +18,7 @@ app.get('/terminos', (req, res) => {
 
 // Ruta para guardar un nuevo término correctamente
 app.post('/api/guardar', (req, res) => {
+  console.log("📥 Datos recibidos del formulario:", req.body); // 👈 Agregado
   const nuevo = req.body;
   const data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
 
