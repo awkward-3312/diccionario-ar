@@ -256,14 +256,26 @@
     }
 
     function mostrarConfirmacion() {
-      const popup = document.getElementById("mensaje-popup");
-      popup.style.display = "block";
-      setTimeout(() => {
-        popup.style.display = "none";
-        document.getElementById("formulario-agregar").reset();
-        mostrarCampos("");
-      }, 2000);
-    }
+  const popup = document.getElementById("mensaje-popup");
+  popup.style.display = "block";
+
+  setTimeout(() => {
+    popup.style.display = "none";
+    document.getElementById("formulario-agregar").reset();
+    mostrarCampos("");
+    recargarGlosario(); // 👉 recarga los datos del backend
+  }, 2000);
+}
+function recargarGlosario() {
+  fetch("https://diccionario-ar-backend.onrender.com/terminos")
+    .then(res => res.json())
+    .then(data => {
+      glosario = data;
+      console.log("✅ Glosario recargado");
+    })
+    .catch(err => console.error("❌ Error al recargar glosario:", err));
+}
+
   </script>
 </body>
 </html>
