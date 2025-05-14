@@ -4,112 +4,193 @@
   <meta charset="UTF-8">
   <title>Diccionario - AR</title>
   <style>
-    body {
-      background-color: #111;
-      color: #eee;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 30px;
+    @font-face {
+      font-family: 'MiddleOfApril';
+      src: url('Middle-of-April.ttf') format('truetype');
     }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #0f0f0f, #1a1a1a);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .ventana {
+      background-color: #181818;
+      border-radius: 30px;
+      padding: 40px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      position: relative;
+    }
+
+    .burbujas {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .burbujas span {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-left: 6px;
+    }
+
+    .naranja { background-color: #ff6a00; }
+    .rojo { color: #ff5c39; }
+    .azul { color: #1877f2; }
 
     h1 {
-      text-align: center;
-      color: #3ae374;
+      font-family: 'MiddleOfApril', cursive;
+      font-size: 3.5rem;
+      margin: 0;
+      line-height: 1.2;
+      margin-bottom: 40px;
     }
 
-    form, .buscador {
-      max-width: 600px;
-      margin: 20px auto;
-      background-color: #1f1f1f;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px #000;
-    }
-
-    input, select, textarea, button {
-      display: block;
+    input, button, select, textarea {
       width: 100%;
+      padding: 12px;
       margin-top: 10px;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
       font-size: 16px;
-      background-color: #2a2a2a;
+      border: none;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    input, select, textarea {
+      background: #2a2a2a;
       color: white;
     }
 
     button {
-      background-color: #3a82f7;
+      background-color: #007acc;
+      color: white;
+      font-weight: bold;
       cursor: pointer;
+      transition: background 0.3s;
     }
 
     button:hover {
-      background-color: #245ecb;
-    }
-
-    .campo {
-      display: none;
+      background-color: #005f99;
     }
 
     #resultado {
-      background-color: #222;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 15px;
+      margin-top: 20px;
+      background-color: #292929;
+      padding: 20px;
+      border-radius: 10px;
+      color: #eee;
+      text-align: left;
+      white-space: pre-line;
     }
 
     .titulo-resultado {
-      color: #3ae374;
+      font-size: 1.2rem;
       font-weight: bold;
-      font-size: 1.2em;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+      color: #3ae374;
     }
 
-    iframe {
+    .sinonimos span {
+      background-color: #333;
+      padding: 4px 8px;
+      margin: 2px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .top-buttons {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    .top-buttons button {
+      flex: 1;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 8px;
+    }
+
+    .formulario-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #202020;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      z-index: 999;
       display: none;
+    }
+
+    .formulario-popup h2 {
+      color: white;
+      font-weight: bold;
+      text-transform: uppercase;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h1>Diccionario - AR</h1>
-
-  <!-- Buscador -->
-  <div class="buscador">
-    <input type="text" id="termino" placeholder="Buscar término..." onkeydown="if(event.key==='Enter'){buscar()}">
-    <button onclick="buscar()">Buscar</button>
-    <div id="resultado"></div>
+  <div class="top-buttons">
+    <button onclick="abrirFormulario()">Agregar Término</button>
+    <button onclick="window.location.href='admin.html'">Admin</button>
   </div>
 
-  <!-- Formulario de nuevo término -->
-  <form action="https://script.google.com/macros/s/AKfycbyUsEGU0mcNE2xNlMpVQB2WXehlejAyESWuqiFONMXCWkxxVeYzU0iHffbb207HfnL5aA/exec" method="POST" target="hidden_iframe" onsubmit="mostrarConfirmacion()">
-    <label for="tipo">Agregar nuevo término:</label>
-    <select name="tipo" id="tipo" required onchange="mostrarCampos(this.value)">
-      <option value="">Seleccionar</option>
-      <option value="abreviatura">Abreviatura</option>
-      <option value="termino">Término completo</option>
-      <option value="forma">Forma farmacéutica</option>
-    </select>
-
-    <div id="campos-comunes" class="campo">
-      <input type="text" name="nombre" placeholder="Nombre del término" required>
-      <textarea name="definicion" placeholder="Definición" required></textarea>
+  <div class="ventana">
+    <div class="burbujas">
+      <span class="naranja"></span>
+      <span class="naranja" style="opacity: 0.7;"></span>
+      <span class="naranja" style="opacity: 0.4;"></span>
     </div>
 
-    <div id="campos-termino" class="campo">
-      <input type="text" name="ingles" placeholder="Traducción">
-      <input type="text" name="pronunciacion" placeholder="Pronunciación">
-      <input type="text" name="categoria" placeholder="Categoría gramatical">
-      <input type="text" name="sinonimos" placeholder="Sinónimos (separados por coma)">
-    </div>
+    <h1><span class="azul">Diccionario</span><span class="rojo"> - AR</span></h1>
 
-    <div id="campos-forma" class="campo">
-      <input type="text" name="forma" placeholder="Tipo de forma farmacéutica">
-    </div>
+    <input type="text" id="termino" placeholder="Escribe una palabra o abreviatura..." onkeydown="if(event.key==='Enter'){buscar()}">
+    <button onclick="buscar()">Buscar</button>
 
-    <button type="submit">Guardar término</button>
+    <div id="resultado">Resultado aquí...</div>
+  </div>
+
+  <form id="formulario-agregar" action="https://script.google.com/macros/s/AKfycbyUsEGU0mcNE2xNlMpVQB2WXehlejAyESWuqiFONMXCWkxxVeYzU0iHffbb207HfnL5aA/exec" method="POST" target="hidden_iframe" style="display:none;">
+    <div class="formulario-popup" id="popup-formulario">
+      <h2>AGREGAR NUEVO TÉRMINO</h2>
+      <select name="tipo" id="tipo" required onchange="mostrarCampos(this.value)">
+        <option value="">Seleccionar tipo</option>
+        <option value="abreviatura">Abreviatura</option>
+        <option value="termino">Término completo</option>
+        <option value="forma">Forma farmacéutica</option>
+      </select>
+      <input type="text" name="nombre" id="nombre" placeholder="Nombre del término" required>
+      <textarea name="definicion" id="definicion" placeholder="Definición" required></textarea>
+      <input type="text" name="ingles" id="ingles" placeholder="Traducción">
+      <input type="text" name="pronunciacion" id="pronunciacion" placeholder="Pronunciación">
+      <input type="text" name="categoria" id="categoria" placeholder="Categoría gramatical">
+      <input type="text" name="sinonimos" id="sinonimos" placeholder="Sinónimos (separados por coma)">
+      <input type="text" name="forma" id="tipoForma" placeholder="Tipo de forma farmacéutica">
+      <button type="submit">Guardar</button>
+      <button type="button" onclick="cerrarFormulario()">Cerrar</button>
+    </div>
   </form>
 
-  <p id="mensaje" style="text-align:center;margin-top:20px;"></p>
-  <iframe name="hidden_iframe"></iframe>
+  <iframe name="hidden_iframe" style="display:none;"></iframe>
 
   <script>
     let glosario = {};
@@ -122,18 +203,6 @@
         console.error(err);
       });
 
-    function mostrarCampos(tipo) {
-      document.getElementById("campos-comunes").style.display = tipo ? "block" : "none";
-      document.getElementById("campos-termino").style.display = tipo === "termino" ? "block" : "none";
-      document.getElementById("campos-forma").style.display = tipo === "forma" ? "block" : "none";
-    }
-
-    function mostrarConfirmacion() {
-      setTimeout(() => {
-        document.getElementById("mensaje").textContent = "✅ Término enviado correctamente";
-      }, 500);
-    }
-
     function normalizarTexto(texto) {
       return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
     }
@@ -144,7 +213,6 @@
       resultado.innerHTML = "";
 
       let claveEncontrada = null;
-
       for (let clave in glosario) {
         if (normalizarTexto(clave) === input) {
           claveEncontrada = clave;
@@ -158,24 +226,38 @@
       }
 
       const datos = glosario[claveEncontrada];
-
       if (datos.categoria && datos.categoria.toLowerCase() === "abreviatura") {
+        resultado.innerHTML = `<div class="titulo-resultado">${claveEncontrada}</div><strong>Definición:</strong><br>${datos.definicion}`;
+      } else {
         resultado.innerHTML = `
           <div class="titulo-resultado">${claveEncontrada}</div>
-          <strong>Definición:</strong><br>${datos.definicion}
-        `;
-        return;
+          <strong>Traducción:</strong> ${datos.traduccion || "-"}<br>
+          <strong>Pronunciación:</strong> ${datos.pronunciacion || "-"}<br>
+          <strong>Categoría:</strong> ${datos.categoria || "-"}<br>
+          <strong>Definición:</strong><br>${datos.definicion || "-"}<br>
+          <strong>Sinónimos:</strong><br>
+          <div class="sinonimos">${(datos.sinonimos || []).map(s => `<span>${s}</span>`).join(" ")}</div>`;
       }
+    }
 
-      resultado.innerHTML = `
-        <div class="titulo-resultado">${claveEncontrada}</div>
-        <strong>Traducción:</strong> ${datos.traduccion || "-"}<br>
-        <strong>Pronunciación:</strong> ${datos.pronunciacion || "-"}<br>
-        <strong>Categoría:</strong> ${datos.categoria || "-"}<br>
-        <strong>Definición:</strong><br>${datos.definicion || "-"}<br>
-        <strong>Sinónimos:</strong><br>
-        <div>${(datos.sinonimos || []).map(s => `<span>${s}</span>`).join(", ")}</div>
-      `;
+    function abrirFormulario() {
+      document.getElementById("popup-formulario").style.display = "block";
+      document.getElementById("formulario-agregar").style.display = "block";
+      document.getElementById("tipo").value = "";
+      mostrarCampos("");
+    }
+
+    function cerrarFormulario() {
+      document.getElementById("popup-formulario").style.display = "none";
+      document.getElementById("formulario-agregar").reset();
+    }
+
+    function mostrarCampos(tipo) {
+      document.getElementById("ingles").style.display = tipo === "termino" ? "block" : "none";
+      document.getElementById("pronunciacion").style.display = tipo === "termino" ? "block" : "none";
+      document.getElementById("categoria").style.display = tipo === "termino" ? "block" : "none";
+      document.getElementById("sinonimos").style.display = tipo === "termino" ? "block" : "none";
+      document.getElementById("tipoForma").style.display = tipo === "forma" ? "block" : "none";
     }
   </script>
 </body>
