@@ -159,6 +159,11 @@
       display: none;
       box-shadow: 0 0 10px #000;
     }
+
+    .busqueda {
+      display: flex;
+      gap: 10px;
+    }
   </style>
 </head>
 <body>
@@ -176,8 +181,11 @@
 
     <h1><span class="azul">Diccionario</span><span class="rojo"> - AR</span></h1>
 
-    <input type="text" id="termino" placeholder="Escribe una palabra o abreviatura..." onkeydown="if(event.key==='Enter'){buscar()}">
-    <button onclick="buscar()">Buscar</button>
+    <div class="busqueda">
+      <input type="text" id="termino" placeholder="Escribe una palabra o abreviatura..." onkeydown="if(event.key==='Enter'){buscar()}" style="flex: 1;">
+      <button onclick="buscar()">Buscar</button>
+      <button onclick="limpiarBusqueda()" style="background-color: #444;">Limpiar</button>
+    </div>
 
     <div id="resultado">Resultado aquí...</div>
   </div>
@@ -204,7 +212,6 @@
   </form>
 
   <div id="mensaje-popup">✅ Guardado correctamente</div>
-
   <iframe name="hidden_iframe" style="display:none;"></iframe>
 
   <script>
@@ -219,7 +226,7 @@
       });
 
     function normalizarTexto(texto) {
-      return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+      return texto.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toUpperCase();
     }
 
     function buscar() {
@@ -253,6 +260,11 @@
           <strong>Sinónimos:</strong><br>
           <div class="sinonimos">${(datos.sinonimos || []).map(s => `<span>${s}</span>`).join(" ")}</div>`;
       }
+    }
+
+    function limpiarBusqueda() {
+      document.getElementById("termino").value = "";
+      document.getElementById("resultado").innerText = "Resultado aquí...";
     }
 
     function abrirFormulario() {
