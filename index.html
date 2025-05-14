@@ -162,13 +162,15 @@
   <script>
     let glosario = {};
 
-    fetch("https://diccionario-ar-backend.onrender.com/api/glosario")
-      .then(res => res.json())
-      .then(data => glosario = data)
-      .catch(err => {
-        document.getElementById("resultado").innerText = "Error al cargar glosario.json";
-        console.error(err);
-      });
+  fetch("https://diccionario-ar-backend.onrender.com/terminos")
+  .then(res => res.json())
+  .then(data => {
+    glosario = {};
+    data.forEach(item => {
+      glosario[item.termino] = item;
+    });
+  })
+;
 
     function normalizarTexto(texto) {
       return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
