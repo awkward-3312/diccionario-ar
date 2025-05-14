@@ -277,7 +277,7 @@
       const traduccion = document.getElementById("traduccion").value.trim();
       const pronunciacion = document.getElementById("pronunciacion").value.trim();
       const categoria = document.getElementById("categoria").value.trim();
-      const sinonimos = document.getElementById("sinonimos").value.split(",").map(s => s.trim()).filter(s => s);
+      const sinonimos = document.getElementById("sinonimos").value;
       const tipoForma = document.getElementById("tipoForma").value.trim();
 
       if (!nombre || !definicion) {
@@ -285,22 +285,31 @@
         return;
       }
 
-      let entrada = {
-        nombre: nombre,
-        definicion: definicion,
-        traduccion: tipo === "termino" ? traduccion : "",
-        pronunciacion: tipo === "termino" ? pronunciacion : "",
-        categoria: tipo === "forma" ? "Forma farmacéutica" : tipo === "abreviatura" ? "Abreviatura" : categoria,
-        sinonimos: tipo === "termino" ? sinonimos : [],
-        tipo: tipo === "forma" ? tipoForma : ""
-      };
+      let datos = { tipo: tipo };
+
+      if (tipo === "termino") {
+        datos.espanol = nombre;
+        datos.ingles = traduccion;
+        datos.pronunciacion = pronunciacion;
+        datos.categoria = categoria;
+        datos.definicion = definicion;
+        datos.sinonimos = sinonimos;
+
+      } else if (tipo === "abreviatura") {
+        datos.abreviatura = nombre;
+        datos.definicion = definicion;
+
+      } else if (tipo === "forma") {
+        datos.forma = nombre;
+        datos.definicion = definicion;
+      }
 
       fetch("https://script.google.com/macros/s/AKfycby_wYRJj_KwVKTdqwCjWhjrWGtqiqjWUSRZVCHsRNeChL4xXIwKf9p90annTbcVntEbzg/exec", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(entrada)
+        body: JSON.stringify(datos)
       })
         .then(res => res.text())
         .then(response => {
