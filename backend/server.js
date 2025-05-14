@@ -1,59 +1,33 @@
 const express = require('express');
+const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-const glosarioPath = path.join(__dirname, 'glosario.json');
+const DATA_PATH = path.join(__dirname, 'glosario.json');
 
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Leer el glosario
-app.get('/api/glosario', (req, res) => {
-  fs.readFile(glosarioPath, 'utf8', (err, data) => {
-    if (err) {
-      console.error('Error al leer glosario:', err);
-      return res.status(500).json({ error: 'No se pudo leer el glosario' });
-    }
-    try {
-      const json = JSON.parse(data);
-      res.json(json);
-    } catch (e) {
-      res.status(500).json({ error: 'JSON inválido' });
-    }
-  });
+// ✅ NUEVA RUTA PARA OBTENER TÉRMINOS
+app.get('/terminos', (req, res) => {
+  const data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
+  res.json(data);
 });
 
-// Guardar un nuevo término
-app.post('/api/guardar', (req, res) => {
+// RUTA PARA GUARDAR TÉRMINO (ya la tienes)
+app.post('/agregar', (req, res) => {
   const nuevo = req.body;
+  const data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
 
-  fs.readFile(glosarioPath, 'utf8', (err, data) => {
-    let glosario = {};
-    if (!err && data) {
-      try {
-        glosario = JSON.parse(data);
-      } catch (e) {
-        console.error('JSON corrupto, iniciando nuevo archivo.');
-      }
-    }
+  data.push(nuevo);
+  fs.writeFileSync(DATA_PATH, JSON.stringify(data, null, 2), 'utf8');
 
-    glosario[nuevo.nombre || nuevo.forma || 'SIN_NOMBRE'] = nuevo;
-
-    fs.writeFile(glosarioPath, JSON.stringify(glosario, null, 2), err => {
-      if (err) {
-        console.error('Error al guardar término:', err);
-        return res.status(500).json({ error: 'No se pudo guardar el término' });
-      }
-      res.json({ mensaje: 'Término guardado exitosamente' });
-    });
-  });
+  res.json({ mensaje: 'Término guardado correctamente' });
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor escuchando en http://localhost:${PORT}`);
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
+
