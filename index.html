@@ -120,7 +120,7 @@
   <div class="ventana">
     <h1><span class="azul">Diccionario</span><span class="rojo"> - AR</span></h1>
     <div class="busqueda">
-      <input type="text" id="termino" placeholder="Escribe una palabra o abreviatura..." onkeydown="if(event.key==='Enter'){buscar()}">
+      <input type="text" id="termino" placeholder="Escribe una palabra o abreviatura...">
     </div>
     <div class="botones-busqueda">
       <button onclick="buscar()">Buscar</button>
@@ -135,27 +135,26 @@
       <button onclick="window.location.href='admin.html'">Admin</button>
     </div>
 
-    <div id="resultado">⏳ Cargando términos...</div>
+    <div id="resultado">Resultado aquí...</div>
   </div>
 
-  <!-- FORMULARIO EMERGENTE -->
-  <form id="formulario-agregar" action="https://diccionario-ar-backend.onrender.com/api/guardar" method="POST" target="hidden_iframe" onsubmit="mostrarConfirmacion()" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 999; background: #202020; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%; height: auto; overflow-y: auto;">
+  <form id="formulario-agregar" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 999; background: #202020; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%; height: auto; overflow-y: auto;">
     <div class="formulario-popup" id="popup-formulario">
       <h2 style="font-family: 'MiddleOfApril', cursive; color: white; font-weight: bold;">AGREGAR NUEVO TÉRMINO</h2>
-      <select name="tipo" id="tipo" required onchange="mostrarCampos(this.value)">
+      <select id="tipo" required onchange="mostrarCampos(this.value)">
         <option value="">Seleccionar tipo</option>
         <option value="abreviatura">Abreviatura</option>
         <option value="termino">Término completo</option>
         <option value="forma">Forma farmacéutica</option>
       </select>
-      <input type="text" name="nombre" id="nombre" placeholder="Nombre del término">
-      <textarea name="definicion" id="definicion" placeholder="Definición" required></textarea>
-      <input type="text" name="ingles" id="ingles" placeholder="Traducción">
-      <input type="text" name="pronunciacion" id="pronunciacion" placeholder="Pronunciación">
-      <input type="text" name="categoria" id="categoria" placeholder="Categoría gramatical">
-      <input type="text" name="sinonimos" id="sinonimos" placeholder="Sinónimos (separados por coma)">
-      <input type="text" name="forma" id="tipoForma" placeholder="Forma farmacéutica en inglés">
-      <button type="submit">Guardar</button>
+      <input type="text" id="nombre" placeholder="Nombre del término">
+      <textarea id="definicion" placeholder="Definición" required></textarea>
+      <input type="text" id="ingles" placeholder="Traducción">
+      <input type="text" id="pronunciacion" placeholder="Pronunciación">
+      <input type="text" id="categoria" placeholder="Categoría gramatical">
+      <input type="text" id="sinonimos" placeholder="Sinónimos (separados por coma)">
+      <input type="text" id="tipoForma" placeholder="Forma farmacéutica en inglés">
+      <button type="button" onclick="enviarTermino()">Guardar</button>
       <button type="button" onclick="cerrarFormulario()">Cerrar</button>
     </div>
   </form>
@@ -164,63 +163,13 @@
     📩 Enviado a revisión exitosamente
   </div>
 
-  <iframe name="hidden_iframe" style="display:none;"></iframe>
-
-  <!-- SCRIPT -->
   <script>
-    let glosario = {};
-    let cargado = false;
-
-    fetch("https://diccionario-ar-backend.onrender.com/terminos")
-      .then(res => res.json())
-      .then(data => {
-        glosario = data;
-        cargado = true;
-        document.getElementById("resultado").innerText = "Resultado aquí...";
-        console.log("✅ Glosario cargado:", glosario);
-      })
-      .catch(err => {
-        console.error("❌ Error al cargar términos:", err);
-        document.getElementById("resultado").innerText = "❌ No se pudieron cargar los términos.";
-      });
-
     function normalizarTexto(texto) {
       return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
     }
 
     function buscar() {
-      const input = normalizarTexto(document.getElementById("termino").value.trim());
-      const resultado = document.getElementById("resultado");
-      resultado.innerHTML = "";
-
-      if (!input || !cargado) {
-        resultado.innerText = "Por favor espera o escribe un término.";
-        return;
-      }
-
-      const datos = glosario[input];
-
-      if (!datos) {
-        resultado.innerText = "Término no encontrado.";
-        return;
-      }
-
-      if (datos.categoria && datos.categoria.toLowerCase() === "abreviatura") {
-        resultado.innerHTML = `
-          <div class="titulo-resultado">${input}</div>
-          <strong>Definición:</strong><br>${datos.definicion || "-"}
-        `;
-      } else {
-        resultado.innerHTML = `
-          <div class="titulo-resultado">${input}</div>
-          <strong>Traducción:</strong> ${datos.traduccion || "-"}<br>
-          <strong>Pronunciación:</strong> ${datos.pronunciacion || "-"}<br>
-          <strong>Categoría:</strong> ${datos.categoria || "-"}<br>
-          <strong>Definición:</strong><br>${datos.definicion || "-"}<br>
-          <strong>Sinónimos:</strong><br>
-          <div class="sinonimos">${(datos.sinonimos || []).map(s => `<span>${s}</span>`).join(" ")}</div>
-        `;
-      }
+      alert("Por ahora la búsqueda no está conectada a Google Sheets. Solo puedes guardar.");
     }
 
     function limpiarBusqueda() {
@@ -251,31 +200,51 @@
       document.getElementById("categoria").style.display = mostrarDetalles ? "block" : "none";
       document.getElementById("sinonimos").style.display = mostrarDetalles ? "block" : "none";
       document.getElementById("tipoForma").style.display = mostrarForma ? "block" : "none";
-      document.getElementById("nombre").style.display = mostrarAbrev ? "block" : "none";
+      document.getElementById("nombre").style.display = tipo ? "block" : "none";
       document.getElementById("definicion").style.display = tipo ? "block" : "none";
     }
 
     function mostrarConfirmacion() {
-  const popup = document.getElementById("mensaje-popup");
-  popup.style.display = "block";
+      const popup = document.getElementById("mensaje-popup");
+      popup.style.display = "block";
+      setTimeout(() => {
+        popup.style.display = "none";
+      }, 2000);
+    }
 
-  setTimeout(() => {
-    popup.style.display = "none";
-    document.getElementById("formulario-agregar").reset();
-    mostrarCampos("");
-    recargarGlosario(); // 👉 recarga los datos del backend
-  }, 2000);
-}
-function recargarGlosario() {
-  fetch("https://diccionario-ar-backend.onrender.com/terminos")
-    .then(res => res.json())
-    .then(data => {
-      glosario = data;
-      console.log("✅ Glosario recargado");
-    })
-    .catch(err => console.error("❌ Error al recargar glosario:", err));
-}
+    function enviarTermino() {
+      const tipo = document.getElementById("tipo").value;
+      const nombre = document.getElementById("nombre").value.trim();
+      const definicion = document.getElementById("definicion").value.trim();
+      const ingles = document.getElementById("ingles").value.trim();
+      const pronunciacion = document.getElementById("pronunciacion").value.trim();
+      const categoria = document.getElementById("categoria").value.trim();
+      const sinonimos = document.getElementById("sinonimos").value.trim();
+      const forma = document.getElementById("tipoForma").value.trim();
 
+      if (!tipo || !nombre || !definicion) {
+        alert("Completa al menos el tipo, nombre y definición.");
+        return;
+      }
+
+      const datos = { tipo, nombre, definicion, ingles, pronunciacion, categoria, sinonimos, forma };
+
+      fetch("https://script.google.com/macros/s/AKfycbz3liKdqW3Q1sH-ngtSZp-FIo-z3l1d6eLM_EVmyQk-Et9ScVaNDGXtT1xsbnbfRl9v/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos)
+      })
+        .then(res => res.json())
+        .then(res => {
+          mostrarConfirmacion();
+          cerrarFormulario();
+          console.log("✅ Guardado en Google Sheets:", res);
+        })
+        .catch(err => {
+          alert("❌ Error al guardar el término.");
+          console.error("Error:", err);
+        });
+    }
   </script>
 </body>
 </html>
