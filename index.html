@@ -146,6 +146,19 @@
       text-transform: uppercase;
       text-align: center;
     }
+
+    #mensaje-popup {
+      position: fixed;
+      top: 20px;
+      background-color: #3ae374;
+      color: black;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 0 10px #000;
+    }
   </style>
 </head>
 <body>
@@ -169,7 +182,7 @@
     <div id="resultado">Resultado aquí...</div>
   </div>
 
-  <form id="formulario-agregar" action="https://script.google.com/macros/s/AKfycbyUsEGU0mcNE2xNlMpVQB2WXehlejAyESWuqiFONMXCWkxxVeYzU0iHffbb207HfnL5aA/exec" method="POST" target="hidden_iframe" style="display:none;">
+  <form id="formulario-agregar" action="https://script.google.com/macros/s/AKfycbyUsEGU0mcNE2xNlMpVQB2WXehlejAyESWuqiFONMXCWkxxVeYzU0iHffbb207HfnL5aA/exec" method="POST" target="hidden_iframe" onsubmit="mostrarConfirmacion()" style="display:none;">
     <div class="formulario-popup" id="popup-formulario">
       <h2>AGREGAR NUEVO TÉRMINO</h2>
       <select name="tipo" id="tipo" required onchange="mostrarCampos(this.value)">
@@ -189,6 +202,8 @@
       <button type="button" onclick="cerrarFormulario()">Cerrar</button>
     </div>
   </form>
+
+  <div id="mensaje-popup">✅ Guardado correctamente</div>
 
   <iframe name="hidden_iframe" style="display:none;"></iframe>
 
@@ -258,6 +273,20 @@
       document.getElementById("categoria").style.display = tipo === "termino" ? "block" : "none";
       document.getElementById("sinonimos").style.display = tipo === "termino" ? "block" : "none";
       document.getElementById("tipoForma").style.display = tipo === "forma" ? "block" : "none";
+    }
+
+    function mostrarConfirmacion() {
+      const popup = document.getElementById("mensaje-popup");
+      popup.style.display = "block";
+      setTimeout(() => {
+        popup.style.display = "none";
+        document.getElementById("formulario-agregar").reset();
+        document.getElementById("tipoForma").style.display = "none";
+        document.getElementById("ingles").style.display = "none";
+        document.getElementById("pronunciacion").style.display = "none";
+        document.getElementById("categoria").style.display = "none";
+        document.getElementById("sinonimos").style.display = "none";
+      }, 3000);
     }
   </script>
 </body>
