@@ -161,8 +161,17 @@
     }
 
     .busqueda {
+      display: block;
+    }
+
+    .botones-busqueda {
       display: flex;
+      justify-content: center;
       gap: 10px;
+    }
+
+    .botones-busqueda button {
+      width: 120px;
     }
   </style>
 </head>
@@ -182,7 +191,9 @@
     <h1><span class="azul">Diccionario</span><span class="rojo"> - AR</span></h1>
 
     <div class="busqueda">
-      <input type="text" id="termino" placeholder="Escribe una palabra o abreviatura..." onkeydown="if(event.key==='Enter'){buscar()}" style="flex: 1;">
+      <input type="text" id="termino" placeholder="Escribe una palabra o abreviatura..." onkeydown="if(event.key==='Enter'){buscar()}">
+    </div>
+    <div class="botones-busqueda">
       <button onclick="buscar()">Buscar</button>
       <button onclick="limpiarBusqueda()" style="background-color: #444;">Limpiar</button>
     </div>
