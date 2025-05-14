@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Diccionario - AR</title>
   <style>
-    /* Fuente personalizada */
     @font-face {
       font-family: 'MiddleOfApril';
       src: url('Middle-of-April.ttf') format('truetype');
@@ -26,7 +25,7 @@
       border-radius: 30px;
       padding: 40px;
       width: 90%;
-      max-width: 650px;
+      max-width: 700px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
       text-align: center;
       position: relative;
@@ -56,7 +55,6 @@
       font-size: 3.5rem;
       margin: 0;
       line-height: 1.2;
-      letter-spacing: 1px;
       margin-bottom: 40px;
     }
 
@@ -92,7 +90,23 @@
       padding: 20px;
       border-radius: 10px;
       color: #eee;
+      text-align: left;
       white-space: pre-line;
+    }
+
+    .titulo-resultado {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #3ae374;
+    }
+
+    .sinonimos span {
+      background-color: #333;
+      padding: 4px 8px;
+      margin: 2px;
+      border-radius: 6px;
+      display: inline-block;
     }
   </style>
 </head>
@@ -104,11 +118,11 @@
       <span class="naranja" style="opacity: 0.4;"></span>
     </div>
 
-    <h1 class="titulo">
+    <h1>
       <span class="azul">Diccionario</span><span class="rojo"> - AR</span>
     </h1>
 
-    <input type="text" id="termino" placeholder="Escribe una abreviatura o término..." onkeydown="if(event.key==='Enter'){buscar()}">
+    <input type="text" id="termino" placeholder="Escribe una palabra o abreviatura..." onkeydown="if(event.key==='Enter'){buscar()}">
     <button onclick="buscar()">Buscar</button>
 
     <div id="resultado">Resultado aquí...</div>
@@ -118,34 +132,47 @@
     let glosario = {};
 
     fetch("glosario.json")
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => glosario = data)
-      .catch(error => {
+      .catch(err => {
         document.getElementById("resultado").innerText = "Error al cargar glosario.json";
-        console.error(error);
+        console.error(err);
       });
 
     function normalizarTexto(texto) {
-      return texto.normalize("NFD")
-                  .replace(/[\u0300-\u036f]/g, "")
-                  .toUpperCase();
+      return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
     }
 
     function buscar() {
       const input = normalizarTexto(document.getElementById("termino").value.trim());
       const resultado = document.getElementById("resultado");
-      let encontrado = null;
+      resultado.innerHTML = "";
+
+      let claveEncontrada = null;
 
       for (let clave in glosario) {
         if (normalizarTexto(clave) === input) {
-          encontrado = clave;
+          claveEncontrada = clave;
           break;
         }
       }
 
-      resultado.innerText = encontrado
-        ? `Término encontrado:\n\n${encontrado}\n\nDefinición:\n\n${glosario[encontrado]}`
-        : "Término no encontrado.";
+      if (!claveEncontrada) {
+        resultado.innerText = "Término no encontrado.";
+        return;
+      }
+
+      const datos = glosario[claveEncontrada];
+      resultado.innerHTML = `
+        <div class="titulo-resultado">${claveEncontrada}</div>
+        <strong>Traducción:</strong> ${datos.traduccion}<br>
+        <strong>Pronunciación:</strong> /${datos.pronunciacion}/<br>
+        <strong>Categoría:</strong> ${datos.categoria}<br>
+        <strong>Definición:</strong><br>${datos.definicion}<br>
+        <strong>Sinónimos:</strong><br><div class="sinonimos">
+          ${datos.sinonimos.map(s => `<span>${s}</span>`).join(" ")}
+        </div>
+      `;
     }
   </script>
 </body>
