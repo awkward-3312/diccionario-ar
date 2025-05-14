@@ -194,24 +194,26 @@
       const resultado = document.getElementById("resultado");
       resultado.innerHTML = "";
 
-      const claves = Object.keys(glosario);
-      const claveEncontrada = claves.find(clave => normalizarTexto(clave) === input);
+      if (!input || Object.keys(glosario).length === 0) {
+        resultado.innerText = "Por favor espera o escribe un término.";
+        return;
+      }
 
-      if (!claveEncontrada) {
+      const datos = glosario[input];
+
+      if (!datos) {
         resultado.innerText = "Término no encontrado.";
         return;
       }
 
-      const datos = glosario[claveEncontrada];
-
       if (datos.categoria && datos.categoria.toLowerCase() === "abreviatura") {
         resultado.innerHTML = `
-          <div class="titulo-resultado">${claveEncontrada}</div>
+          <div class="titulo-resultado">${input}</div>
           <strong>Definición:</strong><br>${datos.definicion || "-"}
         `;
       } else {
         resultado.innerHTML = `
-          <div class="titulo-resultado">${claveEncontrada}</div>
+          <div class="titulo-resultado">${input}</div>
           <strong>Traducción:</strong> ${datos.traduccion || "-"}<br>
           <strong>Pronunciación:</strong> ${datos.pronunciacion || "-"}<br>
           <strong>Categoría:</strong> ${datos.categoria || "-"}<br>
