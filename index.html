@@ -18,6 +18,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
     }
 
     .ventana {
@@ -110,13 +111,19 @@
     }
 
     .top-buttons {
-      position: fixed;
-      top: 10px;
       width: 100%;
+      max-width: 700px;
       display: flex;
       justify-content: space-between;
-      padding: 0 20px;
-      box-sizing: border-box;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    .top-buttons button {
+      flex: 1;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 8px;
     }
 
     .formulario-popup {
@@ -242,10 +249,12 @@
 
       document.getElementById("tipo").addEventListener("change", function () {
         const tipo = this.value;
-        document.getElementById("traduccion").style.display = tipo === "abreviatura" ? "none" : "block";
-        document.getElementById("pronunciacion").style.display = tipo === "abreviatura" ? "none" : "block";
-        document.getElementById("categoria").style.display = tipo === "abreviatura" ? "none" : "block";
-        document.getElementById("sinonimos").style.display = tipo === "abreviatura" ? "none" : "block";
+        const mostrarDetalles = tipo === "termino";
+
+        document.getElementById("traduccion").style.display = mostrarDetalles ? "block" : "none";
+        document.getElementById("pronunciacion").style.display = mostrarDetalles ? "block" : "none";
+        document.getElementById("categoria").style.display = mostrarDetalles ? "block" : "none";
+        document.getElementById("sinonimos").style.display = mostrarDetalles ? "block" : "none";
         document.getElementById("tipoForma").style.display = tipo === "forma" ? "block" : "none";
       });
     }
@@ -272,10 +281,10 @@
       let entrada = {
         nombre: nombre,
         definicion: definicion,
-        traduccion: tipo === "abreviatura" ? "" : traduccion,
-        pronunciacion: tipo === "abreviatura" ? "" : pronunciacion,
+        traduccion: tipo === "termino" ? traduccion : "",
+        pronunciacion: tipo === "termino" ? pronunciacion : "",
         categoria: tipo === "forma" ? "Forma farmacéutica" : tipo === "abreviatura" ? "Abreviatura" : categoria,
-        sinonimos: tipo === "abreviatura" ? [] : sinonimos,
+        sinonimos: tipo === "termino" ? sinonimos : [],
         tipo: tipo === "forma" ? tipoForma : ""
       };
 
