@@ -204,7 +204,7 @@
       document.getElementById("resultado").innerText = "Resultado aquí...";
     }
   </script>
-<form id="formulario-agregar" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 999; background: #202020; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%;">
+<form id="formulario-agregar" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 999; background: #202020; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%; height: auto; overflow-y: auto;">
   <div class="formulario-popup" id="popup-formulario">
     <h2>AGREGAR NUEVO TÉRMINO</h2>
     <select name="tipo" id="tipo" required onchange="mostrarCampos(this.value)">
@@ -235,9 +235,10 @@
   }
 
   function cerrarFormulario() {
-    document.getElementById("popup-formulario").style.display = "none";
-    document.getElementById("formulario-agregar").reset();
-  }
+  document.getElementById("popup-formulario").style.display = "none";
+  document.getElementById("formulario-agregar").style.display = "none";
+  document.getElementById("formulario-agregar").reset();
+}
 
   function mostrarCampos(tipo) {
     document.getElementById("ingles").style.display = tipo === "termino" ? "block" : "none";
