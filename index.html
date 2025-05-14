@@ -135,7 +135,7 @@
       <button onclick="window.location.href='admin.html'">Admin</button>
     </div>
 
-    <div id="resultado">Resultado aquí...</div>
+    <div id="resultado">⏳ Cargando términos...</div>
   </div>
 
   <!-- FORMULARIO EMERGENTE -->
@@ -169,19 +169,18 @@
   <!-- SCRIPT -->
   <script>
     let glosario = {};
+    let cargado = false;
 
     fetch("https://diccionario-ar-backend.onrender.com/terminos")
       .then(res => res.json())
       .then(data => {
-        glosario = {};
-        data.forEach(item => {
-          const clave = normalizarTexto(item.termino);
-          glosario[clave] = item;
-        });
+        glosario = data;
+        cargado = true;
+        document.getElementById("resultado").innerText = "Resultado aquí...";
         console.log("✅ Glosario cargado:", glosario);
       })
       .catch(err => {
-        console.error("Error al cargar términos:", err);
+        console.error("❌ Error al cargar términos:", err);
         document.getElementById("resultado").innerText = "❌ No se pudieron cargar los términos.";
       });
 
@@ -194,7 +193,7 @@
       const resultado = document.getElementById("resultado");
       resultado.innerHTML = "";
 
-      if (!input || Object.keys(glosario).length === 0) {
+      if (!input || !cargado) {
         resultado.innerText = "Por favor espera o escribe un término.";
         return;
       }
