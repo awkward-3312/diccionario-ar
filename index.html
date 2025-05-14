@@ -10,21 +10,21 @@
     }
 
     body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: 
-    linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
-    url('FONDOOO.jpeg') no-repeat center center fixed;
-  background-size: cover;
-  background-attachment: fixed;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  animation: parallax 60s linear infinite;
-}
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
+        url('FONDOOO.jpeg') no-repeat center center fixed;
+      background-size: cover;
+      background-attachment: fixed;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      animation: parallax 60s linear infinite;
+    }
 
     @keyframes parallax {
       0% { background-position: center center; }
@@ -43,30 +43,11 @@
       position: relative;
     }
 
-    .burbujas {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-    }
-
-    .burbujas span {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      margin-left: 6px;
-    }
-
-    .naranja { background-color: #ff6a00; }
-    .rojo { color: #ff5c39; }
-    .azul { color: #1877f2; }
-
     h1 {
       font-family: 'MiddleOfApril', cursive;
       font-size: 3.5rem;
-      margin: 0;
+      margin: 0 0 40px 0;
       line-height: 1.2;
-      margin-bottom: 40px;
     }
 
     input, button, select, textarea {
@@ -121,10 +102,6 @@
       display: inline-block;
     }
 
-    .busqueda {
-      display: block;
-    }
-
     .botones-busqueda {
       display: flex;
       justify-content: center;
@@ -134,44 +111,79 @@
     .botones-busqueda button {
       width: 120px;
     }
-  @keyframes parallax {
-  0% { background-position: center center; }
-  50% { background-position: center top; }
-  100% { background-position: center center; }
-}
-</style>
+
+    .azul { color: #1877f2; }
+    .rojo { color: #ff5c39; }
+  </style>
 </head>
 <body>
   <div class="ventana">
     <h1><span class="azul">Diccionario</span><span class="rojo"> - AR</span></h1>
     <div class="busqueda">
-      <input type="text" id="termino" placeholder="Escribe una palabra o abreviatura..." onkeydown="if(event.key==='Enter'){buscar()}" />
+      <input type="text" id="termino" placeholder="Escribe una palabra o abreviatura..." onkeydown="if(event.key==='Enter'){buscar()}">
     </div>
     <div class="botones-busqueda">
       <button onclick="buscar()">Buscar</button>
       <button onclick="limpiarBusqueda()" style="background-color: #444;">Limpiar</button>
     </div>
+
     <div style="position: fixed; top: 10px; left: 20px; z-index: 1001;">
-  <button onclick="abrirFormulario()">Agregar Término</button>
-</div>
-<div style="position: fixed; top: 10px; right: 20px; z-index: 1001;">
-  <button onclick="window.location.href='admin.html'">Admin</button>
-</div>
+      <button onclick="abrirFormulario()">Agregar Término</button>
+    </div>
+
+    <div style="position: fixed; top: 10px; right: 20px; z-index: 1001;">
+      <button onclick="window.location.href='admin.html'">Admin</button>
+    </div>
+
     <div id="resultado">Resultado aquí...</div>
   </div>
+
+  <!-- FORMULARIO EMERGENTE -->
+  <form id="formulario-agregar" action="https://diccionario-ar-backend.onrender.com/api/guardar" method="POST" target="hidden_iframe" onsubmit="mostrarConfirmacion()" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 999; background: #202020; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%; height: auto; overflow-y: auto;">
+    <div class="formulario-popup" id="popup-formulario">
+      <h2 style="font-family: 'MiddleOfApril', cursive; color: white; font-weight: bold;">AGREGAR NUEVO TÉRMINO</h2>
+      <select name="tipo" id="tipo" required onchange="mostrarCampos(this.value)">
+        <option value="">Seleccionar tipo</option>
+        <option value="abreviatura">Abreviatura</option>
+        <option value="termino">Término completo</option>
+        <option value="forma">Forma farmacéutica</option>
+      </select>
+      <input type="text" name="nombre" id="nombre" placeholder="Nombre del término">
+      <textarea name="definicion" id="definicion" placeholder="Definición" required></textarea>
+      <input type="text" name="ingles" id="ingles" placeholder="Traducción">
+      <input type="text" name="pronunciacion" id="pronunciacion" placeholder="Pronunciación">
+      <input type="text" name="categoria" id="categoria" placeholder="Categoría gramatical">
+      <input type="text" name="sinonimos" id="sinonimos" placeholder="Sinónimos (separados por coma)">
+      <input type="text" name="forma" id="tipoForma" placeholder="Forma farmacéutica en inglés">
+      <button type="submit">Guardar</button>
+      <button type="button" onclick="cerrarFormulario()">Cerrar</button>
+    </div>
+  </form>
+
+  <div id="mensaje-popup" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #3ae374; color: black; padding: 12px 20px; border-radius: 10px; font-weight: bold; z-index: 1000; display: none; box-shadow: 0 0 10px #000;">
+    📩 Enviado a revisión exitosamente
+  </div>
+
+  <iframe name="hidden_iframe" style="display:none;"></iframe>
+
+  <!-- SCRIPT -->
   <script>
     let glosario = {};
 
-  fetch("https://diccionario-ar-backend.onrender.com/terminos")
-  .then(res => res.json())
-  .then(data => {
-    glosario = {};
-    data.forEach(item => {
-      glosario[item.termino] = item;
-    });
-  })
-
-;
+    fetch("https://diccionario-ar-backend.onrender.com/terminos")
+      .then(res => res.json())
+      .then(data => {
+        glosario = {};
+        data.forEach(item => {
+          const clave = normalizarTexto(item.termino);
+          glosario[clave] = item;
+        });
+        console.log("✅ Glosario cargado:", glosario);
+      })
+      .catch(err => {
+        console.error("Error al cargar términos:", err);
+        document.getElementById("resultado").innerText = "❌ No se pudieron cargar los términos.";
+      });
 
     function normalizarTexto(texto) {
       return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
@@ -191,8 +203,12 @@
       }
 
       const datos = glosario[claveEncontrada];
+
       if (datos.categoria && datos.categoria.toLowerCase() === "abreviatura") {
-        resultado.innerHTML = `<div class="titulo-resultado">${claveEncontrada}</div><strong>Definición:</strong><br>${datos.definicion}`;
+        resultado.innerHTML = `
+          <div class="titulo-resultado">${claveEncontrada}</div>
+          <strong>Definición:</strong><br>${datos.definicion || "-"}
+        `;
       } else {
         resultado.innerHTML = `
           <div class="titulo-resultado">${claveEncontrada}</div>
@@ -201,7 +217,8 @@
           <strong>Categoría:</strong> ${datos.categoria || "-"}<br>
           <strong>Definición:</strong><br>${datos.definicion || "-"}<br>
           <strong>Sinónimos:</strong><br>
-          <div class="sinonimos">${(datos.sinonimos || []).map(s => `<span>${s}</span>`).join(" ")}</div>`;
+          <div class="sinonimos">${(datos.sinonimos || []).map(s => `<span>${s}</span>`).join(" ")}</div>
+        `;
       }
     }
 
@@ -209,68 +226,43 @@
       document.getElementById("termino").value = "";
       document.getElementById("resultado").innerText = "Resultado aquí...";
     }
-  </script>
-<form id="formulario-agregar" action="https://diccionario-ar-backend.onrender.com/api/guardar" method="POST" target="hidden_iframe" onsubmit="mostrarConfirmacion()" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 999; background: #202020; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%; height: auto; overflow-y: auto;">
-  <div class="formulario-popup" id="popup-formulario">
-    <h2 style="font-family: 'MiddleOfApril', cursive; color: white; font-weight: bold;">AGREGAR NUEVO TÉRMINO</h2>
-    <select name="tipo" id="tipo" required onchange="mostrarCampos(this.value)">
-      <option value="">Seleccionar tipo</option>
-      <option value="abreviatura">Abreviatura</option>
-      <option value="termino">Término completo</option>
-      <option value="forma">Forma farmacéutica</option>
-    </select>
-    <input type="text" name="nombre" id="nombre" placeholder="Nombre del término">
-<textarea name="definicion" id="definicion" placeholder="Definición" required></textarea>
-    <input type="text" name="ingles" id="ingles" placeholder="Traducción">
-    <input type="text" name="pronunciacion" id="pronunciacion" placeholder="Pronunciación">
-    <input type="text" name="categoria" id="categoria" placeholder="Categoría gramatical">
-    <input type="text" name="sinonimos" id="sinonimos" placeholder="Sinónimos (separados por coma)">
-    <input type="text" name="forma" id="tipoForma" placeholder="Forma farmacéutica en inglés">
-    <button type="submit">Guardar</button>
-    <button type="button" onclick="cerrarFormulario()">Cerrar</button>
-  </div>
-</form>
-<div id="mensaje-popup" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #3ae374; color: black; padding: 12px 20px; border-radius: 10px; font-weight: bold; z-index: 1000; display: none; box-shadow: 0 0 10px #000;">
-📩 Enviado a revisión exitosamente
-</div>
-<iframe name="hidden_iframe" style="display:none;"></iframe>
-<script>
-  function abrirFormulario() {
-    document.getElementById("popup-formulario").style.display = "block";
-    document.getElementById("formulario-agregar").style.display = "block";
-    document.getElementById("tipo").value = "";
-    mostrarCampos("");
-  }
 
-  function cerrarFormulario() {
-  document.getElementById("popup-formulario").style.display = "none";
-  document.getElementById("formulario-agregar").style.display = "none";
-  document.getElementById("formulario-agregar").reset();
-}
-
-  function mostrarCampos(tipo) {
-  const mostrarDetalles = tipo === "termino";
-  const mostrarAbrev = tipo === "abreviatura";
-  const mostrarForma = tipo === "forma";
-
-  document.getElementById("ingles").style.display = mostrarDetalles ? "block" : "none";
-  document.getElementById("pronunciacion").style.display = mostrarDetalles ? "block" : "none";
-  document.getElementById("categoria").style.display = mostrarDetalles ? "block" : "none";
-  document.getElementById("sinonimos").style.display = mostrarDetalles ? "block" : "none";
-  document.getElementById("tipoForma").style.display = mostrarForma ? "block" : "none";
-  document.getElementById("nombre").style.display = mostrarAbrev ? "block" : "none";
-  document.getElementById("definicion").style.display = tipo ? "block" : "none";
-}
-
-  function mostrarConfirmacion() {
-    const popup = document.getElementById("mensaje-popup");
-    popup.style.display = "block";
-    setTimeout(() => {
-      popup.style.display = "none";
-      document.getElementById("formulario-agregar").reset();
+    function abrirFormulario() {
+      document.getElementById("popup-formulario").style.display = "block";
+      document.getElementById("formulario-agregar").style.display = "block";
+      document.getElementById("tipo").value = "";
       mostrarCampos("");
-    }, 2000);
-  }
-</script>
+    }
+
+    function cerrarFormulario() {
+      document.getElementById("popup-formulario").style.display = "none";
+      document.getElementById("formulario-agregar").style.display = "none";
+      document.getElementById("formulario-agregar").reset();
+    }
+
+    function mostrarCampos(tipo) {
+      const mostrarDetalles = tipo === "termino";
+      const mostrarAbrev = tipo === "abreviatura";
+      const mostrarForma = tipo === "forma";
+
+      document.getElementById("ingles").style.display = mostrarDetalles ? "block" : "none";
+      document.getElementById("pronunciacion").style.display = mostrarDetalles ? "block" : "none";
+      document.getElementById("categoria").style.display = mostrarDetalles ? "block" : "none";
+      document.getElementById("sinonimos").style.display = mostrarDetalles ? "block" : "none";
+      document.getElementById("tipoForma").style.display = mostrarForma ? "block" : "none";
+      document.getElementById("nombre").style.display = mostrarAbrev ? "block" : "none";
+      document.getElementById("definicion").style.display = tipo ? "block" : "none";
+    }
+
+    function mostrarConfirmacion() {
+      const popup = document.getElementById("mensaje-popup");
+      popup.style.display = "block";
+      setTimeout(() => {
+        popup.style.display = "none";
+        document.getElementById("formulario-agregar").reset();
+        mostrarCampos("");
+      }, 2000);
+    }
+  </script>
 </body>
 </html>
