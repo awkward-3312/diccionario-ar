@@ -16,16 +16,16 @@
       color: #3ae374;
     }
 
-    form {
+    form, .buscador {
       max-width: 600px;
-      margin: 0 auto;
+      margin: 20px auto;
       background-color: #1f1f1f;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 0 10px #000;
     }
 
-    select, input, textarea, button {
+    input, select, textarea, button {
       display: block;
       width: 100%;
       margin-top: 10px;
@@ -50,6 +50,20 @@
       display: none;
     }
 
+    #resultado {
+      background-color: #222;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    .titulo-resultado {
+      color: #3ae374;
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+
     iframe {
       display: none;
     }
@@ -58,8 +72,16 @@
 <body>
   <h1>Diccionario - AR</h1>
 
+  <!-- Buscador -->
+  <div class="buscador">
+    <input type="text" id="termino" placeholder="Buscar término..." onkeydown="if(event.key==='Enter'){buscar()}">
+    <button onclick="buscar()">Buscar</button>
+    <div id="resultado"></div>
+  </div>
+
+  <!-- Formulario de nuevo término -->
   <form action="https://script.google.com/macros/s/AKfycbyUsEGU0mcNE2xNlMpVQB2WXehlejAyESWuqiFONMXCWkxxVeYzU0iHffbb207HfnL5aA/exec" method="POST" target="hidden_iframe" onsubmit="mostrarConfirmacion()">
-    <label for="tipo">Tipo de término:</label>
+    <label for="tipo">Agregar nuevo término:</label>
     <select name="tipo" id="tipo" required onchange="mostrarCampos(this.value)">
       <option value="">Seleccionar</option>
       <option value="abreviatura">Abreviatura</option>
@@ -87,10 +109,19 @@
   </form>
 
   <p id="mensaje" style="text-align:center;margin-top:20px;"></p>
-
   <iframe name="hidden_iframe"></iframe>
 
   <script>
+    let glosario = {};
+
+    fetch("glosario.json")
+      .then(res => res.json())
+      .then(data => glosario = data)
+      .catch(err => {
+        document.getElementById("resultado").innerText = "Error al cargar glosario.json";
+        console.error(err);
+      });
+
     function mostrarCampos(tipo) {
       document.getElementById("campos-comunes").style.display = tipo ? "block" : "none";
       document.getElementById("campos-termino").style.display = tipo === "termino" ? "block" : "none";
@@ -101,6 +132,50 @@
       setTimeout(() => {
         document.getElementById("mensaje").textContent = "✅ Término enviado correctamente";
       }, 500);
+    }
+
+    function normalizarTexto(texto) {
+      return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+    }
+
+    function buscar() {
+      const input = normalizarTexto(document.getElementById("termino").value.trim());
+      const resultado = document.getElementById("resultado");
+      resultado.innerHTML = "";
+
+      let claveEncontrada = null;
+
+      for (let clave in glosario) {
+        if (normalizarTexto(clave) === input) {
+          claveEncontrada = clave;
+          break;
+        }
+      }
+
+      if (!claveEncontrada) {
+        resultado.innerText = "Término no encontrado.";
+        return;
+      }
+
+      const datos = glosario[claveEncontrada];
+
+      if (datos.categoria && datos.categoria.toLowerCase() === "abreviatura") {
+        resultado.innerHTML = `
+          <div class="titulo-resultado">${claveEncontrada}</div>
+          <strong>Definición:</strong><br>${datos.definicion}
+        `;
+        return;
+      }
+
+      resultado.innerHTML = `
+        <div class="titulo-resultado">${claveEncontrada}</div>
+        <strong>Traducción:</strong> ${datos.traduccion || "-"}<br>
+        <strong>Pronunciación:</strong> ${datos.pronunciacion || "-"}<br>
+        <strong>Categoría:</strong> ${datos.categoria || "-"}<br>
+        <strong>Definición:</strong><br>${datos.definicion || "-"}<br>
+        <strong>Sinónimos:</strong><br>
+        <div>${(datos.sinonimos || []).map(s => `<span>${s}</span>`).join(", ")}</div>
+      `;
     }
   </script>
 </body>
