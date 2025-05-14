@@ -216,13 +216,13 @@
       <option value="termino">Término completo</option>
       <option value="forma">Forma farmacéutica</option>
     </select>
-    <input type="text" name="nombre" id="nombre" placeholder="Nombre del término" required style="display: none;">
+    <input type="text" name="nombre" id="nombre" placeholder="Nombre del término">
 <textarea name="definicion" id="definicion" placeholder="Definición" required></textarea>
     <input type="text" name="ingles" id="ingles" placeholder="Traducción">
     <input type="text" name="pronunciacion" id="pronunciacion" placeholder="Pronunciación">
     <input type="text" name="categoria" id="categoria" placeholder="Categoría gramatical">
     <input type="text" name="sinonimos" id="sinonimos" placeholder="Sinónimos (separados por coma)">
-    <input type="text" name="forma" id="tipoForma" placeholder="Tipo de forma farmacéutica">
+    <input type="text" name="forma" id="tipoForma" placeholder="Forma farmacéutica en inglés">
     <button type="submit">Guardar</button>
     <button type="button" onclick="cerrarFormulario()">Cerrar</button>
   </div>
@@ -255,7 +255,7 @@
   document.getElementById("categoria").style.display = mostrarDetalles ? "block" : "none";
   document.getElementById("sinonimos").style.display = mostrarDetalles ? "block" : "none";
   document.getElementById("tipoForma").style.display = mostrarForma ? "block" : "none";
-  document.getElementById("nombre").style.display = mostrarForma || mostrarAbrev ? "block" : "none";
+  document.getElementById("nombre").style.display = mostrarAbrev ? "block" : "none";
   document.getElementById("definicion").style.display = tipo ? "block" : "none";
 }
 
