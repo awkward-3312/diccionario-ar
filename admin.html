@@ -60,11 +60,6 @@
       text-align: left;
     }
 
-    .acciones button {
-      margin-right: 10px;
-      padding: 5px 10px;
-    }
-
     .volver {
       text-align: center;
       margin-top: 30px;
@@ -91,26 +86,18 @@
   </div>
 
   <div class="admin-panel" id="admin-panel">
-    <h2>Términos propuestos</h2>
-    <div style="margin-bottom: 15px;">
-      <label for="hoja">Seleccionar hoja: </label>
-      <select id="hoja" onchange="cargarDatosDesdeGoogleSheets()">
-        <option value="Términos">Términos</option>
-        <option value="Abreviaturas">Abreviaturas</option>
-        <option value="Formas">Formas</option>
-      </select>
-    </div>
+    <h2>Términos guardados</h2>
     <table id="tabla">
       <thead>
         <tr>
-          <th>Fecha</th>
+          <th>Tipo</th>
           <th>Nombre</th>
           <th>Traducción</th>
           <th>Pronunciación</th>
           <th>Categoría</th>
           <th>Definición</th>
           <th>Sinónimos</th>
-          <th>Tipo (forma)</th>
+          <th>Forma</th>
         </tr>
       </thead>
       <tbody id="cuerpo-tabla"></tbody>
@@ -133,37 +120,46 @@
       if (usuario === userValido && clave === passValida) {
         document.getElementById("login-box").style.display = "none";
         document.getElementById("admin-panel").style.display = "block";
-        cargarDatosDesdeGoogleSheets();
+        cargarDatos();
       } else {
         mensaje.textContent = "Usuario o contraseña incorrectos.";
       }
     }
 
-    function cargarDatosDesdeGoogleSheets() {
-      const hoja = document.getElementById("hoja").value;
-      const sheetID = "144znR6HxwyxtTdd3-Luuqk1ClIC5UuDLZG5_gWVNiKc";
-      const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=${encodeURIComponent(hoja)}&tqx=out:json`;
+    function cargarDatos() {
+      const scriptURL = "https://script.google.com/macros/s/AKfycbz3liKdqW3Q1sH-ngtSZp-FIo-z3l1d6eLM_EVmyQk-Et9ScVaNDGXtT1xsbnbfRl9v/exec";
 
-      fetch(sheetURL)
-        .then(res => res.text())
-        .then(text => {
-          const json = JSON.parse(text.substr(47).slice(0, -2));
-          const rows = json.table.rows;
+      fetch(scriptURL)
+        .then(res => res.json())
+        .then(data => {
           const cuerpo = document.getElementById("cuerpo-tabla");
           cuerpo.innerHTML = "";
 
-          rows.slice(1).forEach(row => {
+          data.forEach(item => {
             const tr = document.createElement("tr");
-            row.c.forEach(cell => {
+
+            const columnas = [
+              item.tipo,
+              item.nombre,
+              item.ingles,
+              item.pronunciacion,
+              item.categoria,
+              item.definicion,
+              item.sinonimos,
+              item.forma
+            ];
+
+            columnas.forEach(col => {
               const td = document.createElement("td");
-              td.textContent = cell ? cell.v : "";
+              td.textContent = col || "-";
               tr.appendChild(td);
             });
+
             cuerpo.appendChild(tr);
           });
         })
         .catch(error => {
-          console.error("Error al cargar datos de Google Sheets", error);
+          console.error("Error al cargar datos:", error);
         });
     }
   </script>
