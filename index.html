@@ -227,7 +227,7 @@
     <button type="button" onclick="cerrarFormulario()">Cerrar</button>
   </div>
 </form>
-<div id="mensaje-popup" style="position: fixed; top: 20px; background-color: #3ae374; color: black; padding: 12px 20px; border-radius: 10px; font-weight: bold; z-index: 1000; display: none; box-shadow: 0 0 10px #000;">✅ Guardado correctamente</div>
+<div id="mensaje-popup" style="position: fixed; top: 20px; background-color: #3ae374; color: black; padding: 12px 20px; border-radius: 10px; font-weight: bold; z-index: 1000; display: none; box-shadow: 0 0 10px #000;">📩 Enviado a revisión exitosamente✅ Guardado correctamente</div>
 <iframe name="hidden_iframe" style="display:none;"></iframe>
 <script>
   function abrirFormulario() {
@@ -258,7 +258,7 @@
       popup.style.display = "none";
       document.getElementById("formulario-agregar").reset();
       mostrarCampos("");
-    }, 3000);
+    }, 1500);
   }
 </script>
 </body>
