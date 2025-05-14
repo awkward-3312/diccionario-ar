@@ -174,17 +174,20 @@
   <div class="formulario-popup" id="popup-formulario">
     <h2>AGREGAR NUEVO TÉRMINO</h2>
     <select id="tipo">
+      <option value="">Seleccionar tipo</option>
       <option value="abreviatura">Abreviatura</option>
       <option value="termino">Término completo</option>
       <option value="forma">Forma farmacéutica</option>
     </select>
-    <input type="text" id="nombre" placeholder="Nombre del término">
-    <input type="text" id="traduccion" placeholder="Traducción">
-    <input type="text" id="pronunciacion" placeholder="Pronunciación">
-    <input type="text" id="categoria" placeholder="Categoría gramatical">
-    <input type="text" id="tipoForma" placeholder="Tipo de forma farmacéutica">
-    <textarea id="definicion" placeholder="Definición"></textarea>
-    <input type="text" id="sinonimos" placeholder="Sinónimos (separados por coma)">
+
+    <input type="text" id="nombre" placeholder="Nombre del término" style="display: none;">
+    <input type="text" id="traduccion" placeholder="Traducción" style="display: none;">
+    <input type="text" id="pronunciacion" placeholder="Pronunciación" style="display: none;">
+    <input type="text" id="categoria" placeholder="Categoría gramatical" style="display: none;">
+    <input type="text" id="tipoForma" placeholder="Tipo de forma farmacéutica" style="display: none;">
+    <textarea id="definicion" placeholder="Definición" style="display: none;"></textarea>
+    <input type="text" id="sinonimos" placeholder="Sinónimos (separados por coma)" style="display: none;">
+
     <button onclick="guardarTermino()">Guardar</button>
     <button onclick="cerrarFormulario()">Cerrar</button>
   </div>
@@ -248,89 +251,97 @@
 
     function abrirFormulario() {
       document.getElementById("popup-formulario").style.display = "block";
-      document.getElementById("tipoForma").style.display = "none";
-      document.getElementById("traduccion").style.display = "block";
-      document.getElementById("pronunciacion").style.display = "block";
-      document.getElementById("categoria").style.display = "block";
-      document.getElementById("sinonimos").style.display = "block";
-
-      document.getElementById("tipo").addEventListener("change", function () {
-        const tipo = this.value;
-        const mostrarDetalles = tipo === "termino";
-
-        document.getElementById("traduccion").style.display = mostrarDetalles ? "block" : "none";
-        document.getElementById("pronunciacion").style.display = mostrarDetalles ? "block" : "none";
-        document.getElementById("categoria").style.display = mostrarDetalles ? "block" : "none";
-        document.getElementById("sinonimos").style.display = mostrarDetalles ? "block" : "none";
-        document.getElementById("tipoForma").style.display = tipo === "forma" ? "block" : "none";
-      });
+      document.getElementById("tipo").value = "";
+      ocultarTodosLosCampos();
     }
 
     function cerrarFormulario() {
       document.getElementById("popup-formulario").style.display = "none";
     }
 
-    function guardarTermino() {
-  const tipo = document.getElementById("tipo").value;
-  const nombre = document.getElementById("nombre").value.trim().toUpperCase();
-  const definicion = document.getElementById("definicion").value.trim();
-  const traduccion = document.getElementById("traduccion").value.trim();
-  const pronunciacion = document.getElementById("pronunciacion").value.trim();
-  const categoria = document.getElementById("categoria").value.trim();
-  const sinonimos = document.getElementById("sinonimos").value;
-  const tipoForma = document.getElementById("tipoForma").value.trim();
+    function ocultarTodosLosCampos() {
+      const campos = ["nombre", "traduccion", "pronunciacion", "categoria", "tipoForma", "definicion", "sinonimos"];
+      campos.forEach(id => document.getElementById(id).style.display = "none");
+    }
 
-  if (!nombre || !definicion) {
-    alert("Por favor completa al menos el nombre y la definición.");
-    return;
-  }
+    function mostrarCamposPorTipo(tipo) {
+      ocultarTodosLosCampos();
+      document.getElementById("nombre").style.display = "block";
+      document.getElementById("definicion").style.display = "block";
 
-  let datos = { tipo: tipo };
+      if (tipo === "termino") {
+        document.getElementById("traduccion").style.display = "block";
+        document.getElementById("pronunciacion").style.display = "block";
+        document.getElementById("categoria").style.display = "block";
+        document.getElementById("sinonimos").style.display = "block";
+      } else if (tipo === "forma") {
+        document.getElementById("tipoForma").style.display = "block";
+      }
+    }
 
-  if (tipo === "termino") {
-    datos.espanol = nombre;
-    datos.ingles = traduccion;
-    datos.pronunciacion = pronunciacion;
-    datos.categoria = categoria;
-    datos.definicion = definicion;
-    datos.sinonimos = sinonimos;
-
-  } else if (tipo === "abreviatura") {
-    datos.abreviatura = nombre;
-    datos.definicion = definicion;
-
-  } else if (tipo === "forma") {
-    datos.forma = nombre;
-    datos.definicion = definicion;
-  }
-
-  fetch("https://script.google.com/macros/s/AKfycbyujU7RW0_n1jvIb9cMoIJiBW83MGOZRuCHOoVeAx5HjovHfq3sUntqq6At2uRxP42auQ/exec", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(datos)
-  })
-    .then(res => res.text())
-    .then(response => {
-      alert("Término enviado a la hoja correctamente ✅");
-
-      // Limpiar campos
-      document.getElementById("nombre").value = "";
-      document.getElementById("definicion").value = "";
-      document.getElementById("traduccion").value = "";
-      document.getElementById("pronunciacion").value = "";
-      document.getElementById("categoria").value = "";
-      document.getElementById("sinonimos").value = "";
-      document.getElementById("tipoForma").value = "";
-
-      cerrarFormulario();
-    })
-    .catch(error => {
-      alert("Error al enviar el término ❌");
-      console.error(error);
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("tipo").addEventListener("change", function () {
+        mostrarCamposPorTipo(this.value);
+      });
     });
-}
+
+    function guardarTermino() {
+      const tipo = document.getElementById("tipo").value;
+      const nombre = document.getElementById("nombre").value.trim().toUpperCase();
+      const definicion = document.getElementById("definicion").value.trim();
+      const traduccion = document.getElementById("traduccion").value.trim();
+      const pronunciacion = document.getElementById("pronunciacion").value.trim();
+      const categoria = document.getElementById("categoria").value.trim();
+      const sinonimos = document.getElementById("sinonimos").value;
+      const tipoForma = document.getElementById("tipoForma").value.trim();
+
+      if (!tipo || !nombre || !definicion) {
+        alert("Completa los campos requeridos.");
+        return;
+      }
+
+      let datos = { tipo: tipo };
+
+      if (tipo === "termino") {
+        datos.espanol = nombre;
+        datos.ingles = traduccion;
+        datos.pronunciacion = pronunciacion;
+        datos.categoria = categoria;
+        datos.definicion = definicion;
+        datos.sinonimos = sinonimos;
+
+      } else if (tipo === "abreviatura") {
+        datos.abreviatura = nombre;
+        datos.definicion = definicion;
+
+      } else if (tipo === "forma") {
+        datos.forma = nombre;
+        datos.definicion = definicion;
+      }
+
+      fetch("https://script.google.com/macros/s/AKfycbyujU7RW0_n1jvIb9cMoIJiBW83MGOZRuCHOoVeAx5HjovHfq3sUntqq6At2uRxP42auQ/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos)
+      })
+        .then(res => res.text())
+        .then(response => {
+          alert("Término guardado correctamente ✅");
+
+          // Limpiar campos
+          ["nombre", "definicion", "traduccion", "pronunciacion", "categoria", "sinonimos", "tipoForma"].forEach(id => {
+            document.getElementById(id).value = "";
+          });
+
+          // Reset y ocultar
+          document.getElementById("tipo").value = "";
+          ocultarTodosLosCampos();
+        })
+        .catch(error => {
+          alert("Error al enviar el término ❌");
+          console.error(error);
+        });
+    }
   </script>
 </body>
 </html>
