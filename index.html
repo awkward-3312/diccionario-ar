@@ -286,62 +286,62 @@
     });
 
     function guardarTermino() {
-      const tipo = document.getElementById("tipo").value;
-      const nombre = document.getElementById("nombre").value.trim().toUpperCase();
-      const definicion = document.getElementById("definicion").value.trim();
-      const traduccion = document.getElementById("traduccion").value.trim();
-      const pronunciacion = document.getElementById("pronunciacion").value.trim();
-      const categoria = document.getElementById("categoria").value.trim();
-      const sinonimos = document.getElementById("sinonimos").value;
-      const tipoForma = document.getElementById("tipoForma").value.trim();
+  const tipo = document.getElementById("tipo").value;
+  const nombre = document.getElementById("nombre").value.trim().toUpperCase();
+  const definicion = document.getElementById("definicion").value.trim();
+  const traduccion = document.getElementById("traduccion").value.trim();
+  const pronunciacion = document.getElementById("pronunciacion").value.trim();
+  const categoria = document.getElementById("categoria").value.trim();
+  const sinonimos = document.getElementById("sinonimos").value;
+  const tipoForma = document.getElementById("tipoForma").value.trim();
 
-      if (!tipo || !nombre || !definicion) {
-        alert("Completa los campos requeridos.");
-        return;
-      }
+  if (!tipo || !nombre || !definicion) {
+    alert("Completa los campos requeridos.");
+    return;
+  }
 
-      let datos = { tipo: tipo };
+  let datos = { tipo: tipo };
 
-      if (tipo === "termino") {
-        datos.espanol = nombre;
-        datos.ingles = traduccion;
-        datos.pronunciacion = pronunciacion;
-        datos.categoria = categoria;
-        datos.definicion = definicion;
-        datos.sinonimos = sinonimos;
+  if (tipo === "termino") {
+    datos.espanol = nombre;
+    datos.ingles = traduccion;
+    datos.pronunciacion = pronunciacion;
+    datos.categoria = categoria;
+    datos.definicion = definicion;
+    datos.sinonimos = sinonimos;
 
-      } else if (tipo === "abreviatura") {
-        datos.abreviatura = nombre;
-        datos.definicion = definicion;
+  } else if (tipo === "abreviatura") {
+    datos.abreviatura = nombre;
+    datos.definicion = definicion;
 
-      } else if (tipo === "forma") {
-        datos.forma = nombre;
-        datos.definicion = definicion;
-      }
+  } else if (tipo === "forma") {
+    datos.forma = nombre;
+    datos.definicion = definicion;
+  }
 
-      fetch("https://script.google.com/macros/s/AKfycbyujU7RW0_n1jvIb9cMoIJiBW83MGOZRuCHOoVeAx5HjovHfq3sUntqq6At2uRxP42auQ/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(datos)
-      })
-        .then(res => res.text())
-        .then(response => {
-          alert("Término guardado correctamente ✅");
+  fetch("https://script.google.com/macros/s/AKfycbxV_5rMxKUGMdF3BRIJjFw9QHTVPe18S01xRiah1oDQptAW1x_8yxwHWP64E3bqOiAe_g/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(datos)
+  })
+    .then(res => res.json())
+    .then(response => {
+      alert(response.result + " ✅");
 
-          // Limpiar campos
-          ["nombre", "definicion", "traduccion", "pronunciacion", "categoria", "sinonimos", "tipoForma"].forEach(id => {
-            document.getElementById(id).value = "";
-          });
+      // Limpiar campos
+      ["nombre", "definicion", "traduccion", "pronunciacion", "categoria", "sinonimos", "tipoForma"].forEach(id => {
+        document.getElementById(id).value = "";
+      });
 
-          // Reset y ocultar
-          document.getElementById("tipo").value = "";
-          ocultarTodosLosCampos();
-        })
-        .catch(error => {
-          alert("Error al enviar el término ❌");
-          console.error(error);
-        });
-    }
+      // Reset y ocultar
+      document.getElementById("tipo").value = "";
+      ocultarTodosLosCampos();
+    })
+    .catch(error => {
+      alert("Error al enviar el término ❌");
+      console.error(error);
+    });
+}
   </script>
 </body>
 </html>
