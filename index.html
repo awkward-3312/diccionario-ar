@@ -151,6 +151,9 @@
       <button onclick="buscar()">Buscar</button>
       <button onclick="limpiarBusqueda()" style="background-color: #444;">Limpiar</button>
     </div>
+    <div class="botones-superiores">
+      <button onclick="abrirFormulario()">Agregar Término</button>
+    </div>
     <div id="resultado">Resultado aquí...</div>
   </div>
   <script>
@@ -201,5 +204,58 @@
       document.getElementById("resultado").innerText = "Resultado aquí...";
     }
   </script>
+<form id="formulario-agregar" action="https://script.google.com/macros/s/AKfycbyUsEGU0mcNE2xNlMpVQB2WXehlejAyESWuqiFONMXCWkxxVeYzU0iHffbb207HfnL5aA/exec" method="POST" target="hidden_iframe" onsubmit="mostrarConfirmacion()" style="display:none;">
+  <div class="formulario-popup" id="popup-formulario">
+    <h2>AGREGAR NUEVO TÉRMINO</h2>
+    <select name="tipo" id="tipo" required onchange="mostrarCampos(this.value)">
+      <option value="">Seleccionar tipo</option>
+      <option value="abreviatura">Abreviatura</option>
+      <option value="termino">Término completo</option>
+      <option value="forma">Forma farmacéutica</option>
+    </select>
+    <input type="text" name="nombre" id="nombre" placeholder="Nombre del término" required>
+    <textarea name="definicion" id="definicion" placeholder="Definición" required></textarea>
+    <input type="text" name="ingles" id="ingles" placeholder="Traducción">
+    <input type="text" name="pronunciacion" id="pronunciacion" placeholder="Pronunciación">
+    <input type="text" name="categoria" id="categoria" placeholder="Categoría gramatical">
+    <input type="text" name="sinonimos" id="sinonimos" placeholder="Sinónimos (separados por coma)">
+    <input type="text" name="forma" id="tipoForma" placeholder="Tipo de forma farmacéutica">
+    <button type="submit">Guardar</button>
+    <button type="button" onclick="cerrarFormulario()">Cerrar</button>
+  </div>
+</form>
+<div id="mensaje-popup">✅ Guardado correctamente</div>
+<iframe name="hidden_iframe" style="display:none;"></iframe>
+<script>
+  function abrirFormulario() {
+    document.getElementById("popup-formulario").style.display = "block";
+    document.getElementById("formulario-agregar").style.display = "block";
+    document.getElementById("tipo").value = "";
+    mostrarCampos("");
+  }
+
+  function cerrarFormulario() {
+    document.getElementById("popup-formulario").style.display = "none";
+    document.getElementById("formulario-agregar").reset();
+  }
+
+  function mostrarCampos(tipo) {
+    document.getElementById("ingles").style.display = tipo === "termino" ? "block" : "none";
+    document.getElementById("pronunciacion").style.display = tipo === "termino" ? "block" : "none";
+    document.getElementById("categoria").style.display = tipo === "termino" ? "block" : "none";
+    document.getElementById("sinonimos").style.display = tipo === "termino" ? "block" : "none";
+    document.getElementById("tipoForma").style.display = tipo === "forma" ? "block" : "none";
+  }
+
+  function mostrarConfirmacion() {
+    const popup = document.getElementById("mensaje-popup");
+    popup.style.display = "block";
+    setTimeout(() => {
+      popup.style.display = "none";
+      document.getElementById("formulario-agregar").reset();
+      mostrarCampos("");
+    }, 3000);
+  }
+</script>
 </body>
 </html>
