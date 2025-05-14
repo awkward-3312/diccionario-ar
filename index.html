@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Diccionario - AR</title>
+  <style>
+    /* Fuente personalizada */
+    @font-face {
+      font-family: 'MiddleOfApril';
+      src: url('Middle-of-April.ttf') format('truetype');
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #0f0f0f, #1a1a1a);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .ventana {
+      background-color: #181818;
+      border-radius: 30px;
+      padding: 40px;
+      width: 90%;
+      max-width: 650px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      position: relative;
+    }
+
+    .burbujas {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .burbujas span {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-left: 6px;
+    }
+
+    .naranja { background-color: #ff6a00; }
+    .rojo { color: #ff5c39; }
+    .verde { color: #2ecc71; }
+    .azul { color: #1877f2; }
+
+    h1 {
+      font-family: 'MiddleOfApril', cursive;
+      font-size: 3.5rem;
+      margin: 0;
+      line-height: 1.2;
+      letter-spacing: 1px;
+      margin-bottom: 40px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+    }
+
+    input {
+      background: #2a2a2a;
+      color: white;
+    }
+
+    button {
+      background-color: #007acc;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #005f99;
+    }
+
+    #resultado {
+      margin-top: 20px;
+      background-color: #292929;
+      padding: 20px;
+      border-radius: 10px;
+      color: #eee;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+  <div class="ventana">
+    <div class="burbujas">
+      <span class="naranja"></span>
+      <span class="naranja" style="opacity: 0.7;"></span>
+      <span class="naranja" style="opacity: 0.4;"></span>
+    </div>
+
+    <h1 class="titulo">
+      <span class="azul">Diccionario</span><span class="rojo"> - AR</span>
+    </h1>
+
+    <input type="text" id="termino" placeholder="Escribe una abreviatura o término..." onkeydown="if(event.key==='Enter'){buscar()}">
+    <button onclick="buscar()">Buscar</button>
+
+    <div id="resultado">Resultado aquí...</div>
+  </div>
+
+  <script>
+    let glosario = {};
+
+    fetch("glosario.json")
+      .then(response => response.json())
+      .then(data => glosario = data)
+      .catch(error => {
+        document.getElementById("resultado").innerText = "Error al cargar glosario.json";
+        console.error(error);
+      });
+
+    function normalizarTexto(texto) {
+      return texto.normalize("NFD")
+                  .replace(/[\u0300-\u036f]/g, "")
+                  .toUpperCase();
+    }
+
+    function buscar() {
+      const input = normalizarTexto(document.getElementById("termino").value.trim());
+      const resultado = document.getElementById("resultado");
+      let encontrado = null;
+
+      for (let clave in glosario) {
+        if (normalizarTexto(clave) === input) {
+          encontrado = clave;
+          break;
+        }
+      }
+
+      resultado.innerText = encontrado
+        ? `Término encontrado:\n\n${encontrado}\n\nDefinición:\n\n${glosario[encontrado]}`
+        : "Término no encontrado.";
+    }
+  </script>
+</body>
+</html>
