@@ -162,7 +162,7 @@
   <script>
     let glosario = {};
 
-    fetch("glosario.json")
+    fetch("https://diccionario-ar-backend.onrender.com/api/glosario")
       .then(res => res.json())
       .then(data => glosario = data)
       .catch(err => {
@@ -207,7 +207,7 @@
       document.getElementById("resultado").innerText = "Resultado aquí...";
     }
   </script>
-<form id="formulario-agregar" action="https://script.google.com/macros/s/AKfycbyUsEGU0mcNE2xNlMpVQB2WXehlejAyESWuqiFONMXCWkxxVeYzU0iHffbb207HfnL5aA/exec" method="POST" target="hidden_iframe" onsubmit="mostrarConfirmacion()" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 999; background: #202020; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%; height: auto; overflow-y: auto;">
+<form id="formulario-agregar" action="https://diccionario-ar-backend.onrender.com/api/guardar" method="POST" target="hidden_iframe" onsubmit="mostrarConfirmacion()" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 999; background: #202020; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%; height: auto; overflow-y: auto;">
   <div class="formulario-popup" id="popup-formulario">
     <h2 style="font-family: 'MiddleOfApril', cursive; color: white; font-weight: bold;">AGREGAR NUEVO TÉRMINO</h2>
     <select name="tipo" id="tipo" required onchange="mostrarCampos(this.value)">
