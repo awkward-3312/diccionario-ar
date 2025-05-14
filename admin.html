@@ -22,7 +22,7 @@
       margin: 0 auto;
     }
 
-    input, button {
+    input, button, select {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -59,11 +59,6 @@
       border: 1px solid #555;
       text-align: left;
     }
-
-    .acciones button {
-      margin-right: 10px;
-      padding: 5px 10px;
-    }
   </style>
 </head>
 <body>
@@ -77,20 +72,15 @@
   </div>
 
   <div class="admin-panel" id="admin-panel">
-    <h2>Términos propuestos</h2>
+    <label for="hoja">Seleccionar hoja:</label>
+    <select id="hoja" onchange="cargarDatosDesdeGoogleSheets()">
+      <option value="Términos">Términos</option>
+      <option value="Abreviaturas">Abreviaturas</option>
+      <option value="Formas">Formas</option>
+    </select>
+
     <table id="tabla">
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Nombre</th>
-          <th>Traducción</th>
-          <th>Pronunciación</th>
-          <th>Categoría</th>
-          <th>Definición</th>
-          <th>Sinónimos</th>
-          <th>Tipo (forma)</th>
-        </tr>
-      </thead>
+      <thead id="thead"></thead>
       <tbody id="cuerpo-tabla"></tbody>
     </table>
   </div>
@@ -114,18 +104,26 @@
     }
 
     function cargarDatosDesdeGoogleSheets() {
-      const sheetID = "144znR6HxwyxtTdd3-Luuqk1ClIC5UuDLZG5_gWVNiKc";
-      const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json`;
+      const hojaSeleccionada = document.getElementById("hoja").value;
+      const sheetID = "144znR6HxwyxtTdd3-Luuqk1ClIC5UuDLZG5_gWVNiKc"; // tu hoja
+      const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${hojaSeleccionada}`;
 
       fetch(sheetURL)
         .then(res => res.text())
         .then(text => {
           const json = JSON.parse(text.substr(47).slice(0, -2));
+          const cols = json.table.cols;
           const rows = json.table.rows;
-          const cuerpo = document.getElementById("cuerpo-tabla");
-          cuerpo.innerHTML = "";
 
-          rows.slice(1).forEach(row => {
+          const thead = document.getElementById("thead");
+          const cuerpo = document.getElementById("cuerpo-tabla");
+
+          // Crear encabezados
+          thead.innerHTML = "<tr>" + cols.map(col => `<th>${col.label}</th>`).join("") + "</tr>";
+
+          // Crear filas
+          cuerpo.innerHTML = "";
+          rows.forEach(row => {
             const tr = document.createElement("tr");
             row.c.forEach(cell => {
               const td = document.createElement("td");
