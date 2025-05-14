@@ -14,10 +14,10 @@
       padding: 0;
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to bottom, #0f0f0f, #1a1a1a);
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
     }
 
     .ventana {
@@ -107,9 +107,29 @@
       border-radius: 6px;
       display: inline-block;
     }
+
+    .top-buttons {
+      position: fixed;
+      top: 10px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+
+    .top-buttons button {
+      width: auto;
+      padding: 10px 20px;
+    }
   </style>
 </head>
 <body>
+  <div class="top-buttons">
+    <button onclick="abrirFormulario()">Agregar Término</button>
+    <button onclick="window.location.href='admin.html'">Admin</button>
+  </div>
+
   <div class="ventana">
     <div class="burbujas">
       <span class="naranja"></span>
@@ -139,7 +159,7 @@
       });
 
     function normalizarTexto(texto) {
-      return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+      return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
     }
 
     function buscar() {
@@ -182,6 +202,10 @@
           ${datos.sinonimos.map(s => `<span>${s}</span>`).join(" ")}
         </div>
       `;
+    }
+
+    function abrirFormulario() {
+      alert("Aquí se abrirá el formulario para agregar término (pendiente de implementación).");
     }
   </script>
 </body>
