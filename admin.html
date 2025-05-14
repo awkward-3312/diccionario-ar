@@ -85,13 +85,21 @@
 
   <div class="login" id="login-box">
     <input type="text" id="usuario" placeholder="Usuario">
-    <input type="password" id="clave" placeholder="Contraseña">
+    <input type="password" id="clave" placeholder="Contraseña" onkeydown="if(event.key==='Enter'){login()}" />
     <button onclick="login()">Ingresar</button>
     <p id="mensaje" style="color: red;"></p>
   </div>
 
   <div class="admin-panel" id="admin-panel">
     <h2>Términos propuestos</h2>
+    <div style="margin-bottom: 15px;">
+      <label for="hoja">Seleccionar hoja: </label>
+      <select id="hoja" onchange="cargarDatosDesdeGoogleSheets()">
+        <option value="Términos">Términos</option>
+        <option value="Abreviaturas">Abreviaturas</option>
+        <option value="Formas">Formas</option>
+      </select>
+    </div>
     <table id="tabla">
       <thead>
         <tr>
@@ -132,8 +140,9 @@
     }
 
     function cargarDatosDesdeGoogleSheets() {
+      const hoja = document.getElementById("hoja").value;
       const sheetID = "144znR6HxwyxtTdd3-Luuqk1ClIC5UuDLZG5_gWVNiKc";
-      const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json`;
+      const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=${encodeURIComponent(hoja)}&tqx=out:json`;
 
       fetch(sheetURL)
         .then(res => res.text())
