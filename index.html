@@ -151,9 +151,9 @@
       <button onclick="buscar()">Buscar</button>
       <button onclick="limpiarBusqueda()" style="background-color: #444;">Limpiar</button>
     </div>
-    <div class="botones-superiores">
-      <button onclick="abrirFormulario()">Agregar Término</button>
-    </div>
+    <div class="botones-superiores" style="margin-top: 20px;">
+  <button onclick="abrirFormulario()">Agregar Término</button>
+</div>
     <div id="resultado">Resultado aquí...</div>
   </div>
   <script>
@@ -204,7 +204,7 @@
       document.getElementById("resultado").innerText = "Resultado aquí...";
     }
   </script>
-<form id="formulario-agregar" action="https://script.google.com/macros/s/AKfycbyUsEGU0mcNE2xNlMpVQB2WXehlejAyESWuqiFONMXCWkxxVeYzU0iHffbb207HfnL5aA/exec" method="POST" target="hidden_iframe" onsubmit="mostrarConfirmacion()" style="display:none;">
+<form id="formulario-agregar" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 999; background: #202020; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%;">
   <div class="formulario-popup" id="popup-formulario">
     <h2>AGREGAR NUEVO TÉRMINO</h2>
     <select name="tipo" id="tipo" required onchange="mostrarCampos(this.value)">
@@ -224,7 +224,7 @@
     <button type="button" onclick="cerrarFormulario()">Cerrar</button>
   </div>
 </form>
-<div id="mensaje-popup">✅ Guardado correctamente</div>
+<div id="mensaje-popup" style="position: fixed; top: 20px; background-color: #3ae374; color: black; padding: 12px 20px; border-radius: 10px; font-weight: bold; z-index: 1000; display: none; box-shadow: 0 0 10px #000;">✅ Guardado correctamente</div>
 <iframe name="hidden_iframe" style="display:none;"></iframe>
 <script>
   function abrirFormulario() {
