@@ -114,7 +114,8 @@
     }
 
     function cargarDatosDesdeGoogleSheets() {
-      const sheetURL = "https://docs.google.com/spreadsheets/d/144znR6HxwyxtTdd3-Luuqk1ClIC5UuDLZG5_gWVNiKc/gviz/tq?tqx=out:json";
+      const sheetID = "144znR6HxwyxtTdd3-Luuqk1ClIC5UuDLZG5_gWVNiKc";
+      const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json`;
 
       fetch(sheetURL)
         .then(res => res.text())
