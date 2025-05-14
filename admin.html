@@ -2,141 +2,264 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel Admin - Diccionario AR</title>
+  <title>Diccionario - AR</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #111;
-      color: #f1f1f1;
-      margin: 0;
-      padding: 20px;
+    @font-face {
+      font-family: 'MiddleOfApril';
+      src: url('Middle-of-April.ttf') format('truetype');
     }
+
+    body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: 
+    linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
+    url('FONDOOO.jpeg') no-repeat center center fixed;
+  background-size: cover;
+  background-attachment: fixed;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  animation: parallax 60s linear infinite;
+}
+
+    @keyframes parallax {
+      0% { background-position: center center; }
+      50% { background-position: center top; }
+      100% { background-position: center center; }
+    }
+
+    .ventana {
+      background-color: #181818;
+      border-radius: 30px;
+      padding: 40px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      position: relative;
+    }
+
+    .burbujas {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .burbujas span {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-left: 6px;
+    }
+
+    .naranja { background-color: #ff6a00; }
+    .rojo { color: #ff5c39; }
+    .azul { color: #1877f2; }
 
     h1 {
-      color: #3ae374;
-      text-align: center;
+      font-family: 'MiddleOfApril', cursive;
+      font-size: 3.5rem;
+      margin: 0;
+      line-height: 1.2;
+      margin-bottom: 40px;
     }
 
-    .login {
-      max-width: 300px;
-      margin: 0 auto;
-    }
-
-    input, button, select {
+    input, button, select, textarea {
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 1rem;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 16px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
+      box-sizing: border-box;
     }
 
-    input {
-      background: #222;
+    input, select, textarea {
+      background: #2a2a2a;
       color: white;
     }
 
     button {
-      background-color: #3a82f7;
+      background-color: #007acc;
       color: white;
+      font-weight: bold;
       cursor: pointer;
+      transition: background 0.3s;
     }
 
-    .admin-panel {
-      display: none;
-      max-width: 1000px;
-      margin: 20px auto;
+    button:hover {
+      background-color: #005f99;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    #resultado {
       margin-top: 20px;
+      background-color: #292929;
+      padding: 20px;
+      border-radius: 10px;
+      color: white;
+      text-align: left;
+      white-space: pre-line;
     }
 
-    th, td {
-      padding: 10px;
-      border: 1px solid #555;
-      text-align: left;
+    .titulo-resultado {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #3ae374;
     }
-  </style>
+
+    .sinonimos span {
+      background-color: #333;
+      padding: 4px 8px;
+      margin: 2px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .busqueda {
+      display: block;
+    }
+
+    .botones-busqueda {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .botones-busqueda button {
+      width: 120px;
+    }
+  @keyframes parallax {
+  0% { background-position: center center; }
+  50% { background-position: center top; }
+  100% { background-position: center center; }
+}
+</style>
 </head>
 <body>
-  <h1>Panel de Administración</h1>
-
-  <div class="login" id="login-box">
-    <input type="text" id="usuario" placeholder="Usuario">
-    <input type="password" id="clave" placeholder="Contraseña">
-    <button onclick="login()">Ingresar</button>
-    <p id="mensaje" style="color: red;"></p>
+  <div class="ventana">
+    <h1><span class="azul">Diccionario</span><span class="rojo"> - AR</span></h1>
+    <div class="busqueda">
+      <input type="text" id="termino" placeholder="Escribe una palabra o abreviatura..." onkeydown="if(event.key==='Enter'){buscar()}" />
+    </div>
+    <div class="botones-busqueda">
+      <button onclick="buscar()">Buscar</button>
+      <button onclick="limpiarBusqueda()" style="background-color: #444;">Limpiar</button>
+    </div>
+    <div style="position: fixed; top: 10px; left: 20px; z-index: 1001;">
+  <button onclick="abrirFormulario()">Agregar Término</button>
+</div>
+<div style="position: fixed; top: 10px; right: 20px; z-index: 1001;">
+  <button onclick="window.location.href='admin.html'">Admin</button>
+</div>
+    <div id="resultado">Resultado aquí...</div>
   </div>
-
-  <div class="admin-panel" id="admin-panel">
-    <label for="hoja">Seleccionar hoja:</label>
-    <select id="hoja" onchange="cargarDatosDesdeGoogleSheets()">
-      <option value="Términos">Términos</option>
-      <option value="Abreviaturas">Abreviaturas</option>
-      <option value="Formas">Formas</option>
-    </select>
-
-    <table id="tabla">
-      <thead id="thead"></thead>
-      <tbody id="cuerpo-tabla"></tbody>
-    </table>
-  </div>
-
   <script>
-    const userValido = "admin";
-    const passValida = "glosario123";
+    let glosario = {};
 
-    function login() {
-      const usuario = document.getElementById("usuario").value.trim();
-      const clave = document.getElementById("clave").value.trim();
-      const mensaje = document.getElementById("mensaje");
+    fetch("glosario.json")
+      .then(res => res.json())
+      .then(data => glosario = data)
+      .catch(err => {
+        document.getElementById("resultado").innerText = "Error al cargar glosario.json";
+        console.error(err);
+      });
 
-      if (usuario === userValido && clave === passValida) {
-        document.getElementById("login-box").style.display = "none";
-        document.getElementById("admin-panel").style.display = "block";
-        cargarDatosDesdeGoogleSheets();
+    function normalizarTexto(texto) {
+      return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+    }
+
+    function buscar() {
+      const input = normalizarTexto(document.getElementById("termino").value.trim());
+      const resultado = document.getElementById("resultado");
+      resultado.innerHTML = "";
+
+      const claves = Object.keys(glosario);
+      const claveEncontrada = claves.find(clave => normalizarTexto(clave) === input);
+
+      if (!claveEncontrada) {
+        resultado.innerText = "Término no encontrado.";
+        return;
+      }
+
+      const datos = glosario[claveEncontrada];
+      if (datos.categoria && datos.categoria.toLowerCase() === "abreviatura") {
+        resultado.innerHTML = `<div class="titulo-resultado">${claveEncontrada}</div><strong>Definición:</strong><br>${datos.definicion}`;
       } else {
-        mensaje.textContent = "Usuario o contraseña incorrectos.";
+        resultado.innerHTML = `
+          <div class="titulo-resultado">${claveEncontrada}</div>
+          <strong>Traducción:</strong> ${datos.traduccion || "-"}<br>
+          <strong>Pronunciación:</strong> ${datos.pronunciacion || "-"}<br>
+          <strong>Categoría:</strong> ${datos.categoria || "-"}<br>
+          <strong>Definición:</strong><br>${datos.definicion || "-"}<br>
+          <strong>Sinónimos:</strong><br>
+          <div class="sinonimos">${(datos.sinonimos || []).map(s => `<span>${s}</span>`).join(" ")}</div>`;
       }
     }
 
-    function cargarDatosDesdeGoogleSheets() {
-      const hojaSeleccionada = document.getElementById("hoja").value;
-      const sheetID = "144znR6HxwyxtTdd3-Luuqk1ClIC5UuDLZG5_gWVNiKc"; // tu hoja
-      const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${hojaSeleccionada}`;
-
-      fetch(sheetURL)
-        .then(res => res.text())
-        .then(text => {
-          const json = JSON.parse(text.substr(47).slice(0, -2));
-          const cols = json.table.cols;
-          const rows = json.table.rows;
-
-          const thead = document.getElementById("thead");
-          const cuerpo = document.getElementById("cuerpo-tabla");
-
-          // Crear encabezados
-          thead.innerHTML = "<tr>" + cols.map(col => `<th>${col.label}</th>`).join("") + "</tr>";
-
-          // Crear filas
-          cuerpo.innerHTML = "";
-          rows.forEach(row => {
-            const tr = document.createElement("tr");
-            row.c.forEach(cell => {
-              const td = document.createElement("td");
-              td.textContent = cell ? cell.v : "";
-              tr.appendChild(td);
-            });
-            cuerpo.appendChild(tr);
-          });
-        })
-        .catch(error => {
-          console.error("Error al cargar datos de Google Sheets", error);
-        });
+    function limpiarBusqueda() {
+      document.getElementById("termino").value = "";
+      document.getElementById("resultado").innerText = "Resultado aquí...";
     }
   </script>
+<form id="formulario-agregar" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 999; background: #202020; padding: 20px; border-radius: 12px; max-width: 500px; width: 90%; height: auto; overflow-y: auto;">
+  <div class="formulario-popup" id="popup-formulario">
+    <h2 style="font-family: 'MiddleOfApril', cursive; color: white; font-weight: bold;">AGREGAR NUEVO TÉRMINO</h2>
+    <select name="tipo" id="tipo" required onchange="mostrarCampos(this.value)">
+      <option value="">Seleccionar tipo</option>
+      <option value="abreviatura">Abreviatura</option>
+      <option value="termino">Término completo</option>
+      <option value="forma">Forma farmacéutica</option>
+    </select>
+    <input type="text" name="nombre" id="nombre" placeholder="Nombre del término" required>
+    <textarea name="definicion" id="definicion" placeholder="Definición" required></textarea>
+    <input type="text" name="ingles" id="ingles" placeholder="Traducción">
+    <input type="text" name="pronunciacion" id="pronunciacion" placeholder="Pronunciación">
+    <input type="text" name="categoria" id="categoria" placeholder="Categoría gramatical">
+    <input type="text" name="sinonimos" id="sinonimos" placeholder="Sinónimos (separados por coma)">
+    <input type="text" name="forma" id="tipoForma" placeholder="Tipo de forma farmacéutica">
+    <button type="submit">Guardar</button>
+    <button type="button" onclick="cerrarFormulario()">Cerrar</button>
+  </div>
+</form>
+<div id="mensaje-popup" style="position: fixed; top: 20px; background-color: #3ae374; color: black; padding: 12px 20px; border-radius: 10px; font-weight: bold; z-index: 1000; display: none; box-shadow: 0 0 10px #000;">📩 Enviado a revisión exitosamente✅ Guardado correctamente</div>
+<iframe name="hidden_iframe" style="display:none;"></iframe>
+<script>
+  function abrirFormulario() {
+    document.getElementById("popup-formulario").style.display = "block";
+    document.getElementById("formulario-agregar").style.display = "block";
+    document.getElementById("tipo").value = "";
+    mostrarCampos("");
+  }
+
+  function cerrarFormulario() {
+  document.getElementById("popup-formulario").style.display = "none";
+  document.getElementById("formulario-agregar").style.display = "none";
+  document.getElementById("formulario-agregar").reset();
+}
+
+  function mostrarCampos(tipo) {
+    document.getElementById("ingles").style.display = tipo === "termino" ? "block" : "none";
+    document.getElementById("pronunciacion").style.display = tipo === "termino" ? "block" : "none";
+    document.getElementById("categoria").style.display = tipo === "termino" ? "block" : "none";
+    document.getElementById("sinonimos").style.display = tipo === "termino" ? "block" : "none";
+    document.getElementById("tipoForma").style.display = tipo === "forma" ? "block" : "none";
+  }
+
+  function mostrarConfirmacion() {
+    const popup = document.getElementById("mensaje-popup");
+    popup.style.display = "block";
+    setTimeout(() => {
+      popup.style.display = "none";
+      document.getElementById("formulario-agregar").reset();
+      mostrarCampos("");
+    }, 1500);
+  }
+</script>
 </body>
 </html>
