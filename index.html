@@ -139,6 +139,13 @@
       z-index: 999;
       display: none;
     }
+
+    .formulario-popup h2 {
+      color: white;
+      font-weight: bold;
+      text-transform: uppercase;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -165,7 +172,7 @@
   </div>
 
   <div class="formulario-popup" id="popup-formulario">
-    <h2>Agregar nuevo término</h2>
+    <h2>AGREGAR NUEVO TÉRMINO</h2>
     <select id="tipo">
       <option value="abreviatura">Abreviatura</option>
       <option value="termino">Término completo</option>
@@ -298,6 +305,16 @@
         .then(res => res.text())
         .then(response => {
           alert("Término enviado a la hoja correctamente ✅");
+
+          // Limpiar campos
+          document.getElementById("nombre").value = "";
+          document.getElementById("definicion").value = "";
+          document.getElementById("traduccion").value = "";
+          document.getElementById("pronunciacion").value = "";
+          document.getElementById("categoria").value = "";
+          document.getElementById("sinonimos").value = "";
+          document.getElementById("tipoForma").value = "";
+
           cerrarFormulario();
         })
         .catch(error => {
