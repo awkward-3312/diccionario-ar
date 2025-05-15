@@ -148,20 +148,71 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbziHIpDwqhNISY4W5nVSlGnPZt_3MsBs9hPFhAeiQLo_9b7RYW97GIcwjVBw9tu4TJy/exec';
     let glosario = {};
+    let db;
 
-    function normalizarTexto(texto) {
-      return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").toUpperCase();
+    function abrirBaseDatos() {
+      const request = indexedDB.open("DiccionarioAR", 1);
+
+      request.onerror = function () {
+        console.error("❌ Error al abrir IndexedDB.");
+      };
+
+      request.onsuccess = function (event) {
+        db = event.target.result;
+        console.log("✅ IndexedDB abierta.");
+        cargarDesdeIndexedDB();
+      };
+
+      request.onupgradeneeded = function (event) {
+        db = event.target.result;
+        const store = db.createObjectStore("terminos", { keyPath: "nombre" });
+        console.log("🗃️ IndexedDB creada.");
+      };
     }
 
-    function cargarGlosario() {
+    function guardarEnIndexedDB(datos) {
+      const tx = db.transaction("terminos", "readwrite");
+      const store = tx.objectStore("terminos");
+      for (let nombre in datos) {
+        store.put({ nombre, ...datos[nombre] });
+      }
+      tx.oncomplete = () => console.log("📦 Términos guardados localmente en IndexedDB.");
+    }
+
+    function cargarDesdeIndexedDB() {
+      const tx = db.transaction("terminos", "readonly");
+      const store = tx.objectStore("terminos");
+      const request = store.getAll();
+
+      request.onsuccess = function () {
+        const resultado = request.result;
+        if (resultado.length > 0) {
+          console.log("📂 Glosario cargado desde IndexedDB.");
+          glosario = {};
+          resultado.forEach(entrada => {
+            glosario[entrada.nombre] = entrada;
+          });
+        } else {
+          console.log("⚠️ Base de datos vacía. Cargando desde Google Sheets...");
+          cargarGlosario(true);
+        }
+      };
+    }
+
+    function cargarGlosario(guardarLocal = false) {
       fetch(API_URL)
         .then(res => res.json())
         .then(data => {
           glosario = data;
+          if (guardarLocal && db) guardarEnIndexedDB(data);
         })
         .catch(err => {
           console.error("Error al cargar glosario:", err);
         });
+    }
+
+    function normalizarTexto(texto) {
+      return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").toUpperCase();
     }
 
     function buscar() {
@@ -208,22 +259,29 @@
       document.getElementById("resultado").innerText = "Resultado aquí...";
     }
 
-    
-      document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", () => {
+      abrirBaseDatos();
       document.getElementById("termino").addEventListener("keypress", function(e) {
         if (e.key === "Enter") buscar();
       });
-      cargarGlosario();
+
+      window.addEventListener("load", () => {
+        if (navigator.onLine && db) {
+          console.log("🌐 Conexión detectada. Actualizando glosario...");
+          cargarGlosario(true);
+        } else {
+          console.log("⚠️ Sin conexión. Usando datos guardados localmente.");
+        }
+      });
     });
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('serviceWorker.js')
-        .then(reg => console.log('Service Worker registrado ✅'))
-        .catch(err => console.error('Error al registrar Service Worker ❌', err));
-    });
-  }
-</script>
-  
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('serviceWorker.js')
+          .then(reg => console.log('✅ Service Worker registrado:', reg.scope))
+          .catch(err => console.error('❌ Error al registrar SW:', err));
+      });
+    }
+  </script>
 </body>
 </html>
