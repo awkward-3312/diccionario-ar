@@ -86,6 +86,9 @@
       color: white;
       text-align: left;
       white-space: pre-line;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      font-size: 15px;
+      line-height: 1.6;
     }
 
     .titulo-resultado {
@@ -167,7 +170,7 @@
       }
       const entrada = glosario[termino];
       if (!entrada) {
-        resultado.innerText = "Término no encontrado.";
+        resultado.innerText = "⚠️ Término no encontrado.";
         return;
       }
       if ((entrada["Tipo de término"] || '').toLowerCase() === "abreviatura") {
