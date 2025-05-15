@@ -207,19 +207,57 @@
     }
 
     function guardarEdicion(fila) {
-      const inputs = fila.querySelectorAll("input");
-      inputs.forEach((input, i) => {
-        fila.cells[i].innerText = input.value.trim();
-      });
-      fila.querySelector("button").textContent = '✏️';
-      fila.querySelector("button").onclick = () => editarFila(fila.querySelector("button"));
+  const inputs = fila.querySelectorAll("input");
+  const valores = Array.from(inputs).map(input => input.value.trim());
+  const terminoClave = valores[0];
+
+  // Reemplazar celdas por texto plano
+  valores.forEach((valor, i) => {
+    fila.cells[i].innerText = valor;
+  });
+
+  fila.querySelector("button").textContent = '✏️';
+  fila.querySelector("button").onclick = () => editarFila(fila.querySelector("button"));
+
+  // Enviar actualización al servidor
+  fetch('https://script.google.com/macros/s/AKfycbyyBhsgzw1ZFib9G4GFwMUHhsPoKY84Hhyn2bx77EgxnmDXt2vBC_LXbtbQP3f0CogX/exec', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      actualizar: true,
+      termino: terminoClave,
+      traduccion: valores[1],
+      pronunciacion: valores[2],
+      categoria: valores[3],
+      definicion: valores[4],
+      sinonimos: valores[5],
+      tipo: valores[6],
+      formaFarmaceutica: valores[7]
+    })
+  })
+  .then(res => res.text())
+  .then(msg => console.log('✅ Actualizado en Google Sheets:', msg))
+  .catch(err => console.error('❌ Error al actualizar en Sheets:', err));
+}
     }
 
     function eliminarFila(boton) {
-      const fila = boton.parentNode.parentNode;
-      if (confirm("¿Seguro que deseas eliminar esta fila?")) {
-        fila.remove();
-      }
+  const fila = boton.parentNode.parentNode;
+  const termino = fila.cells[0]?.innerText;
+  if (confirm("¿Seguro que deseas eliminar esta fila?")) {
+    fila.remove();
+
+    // Enviar solicitud de eliminación al backend
+    fetch('https://script.google.com/macros/s/AKfycbyyBhsgzw1ZFib9G4GFwMUHhsPoKY84Hhyn2bx77EgxnmDXt2vBC_LXbtbQP3f0CogX/exec', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eliminar: true, termino })
+    })
+    .then(res => res.text())
+    .then(msg => console.log('🗑️ Eliminado en Google Sheets:', msg))
+    .catch(err => console.error('❌ Error al eliminar en Sheets:', err));
+  }
+}
     }
   </script>
 </body>
