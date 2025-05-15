@@ -97,6 +97,7 @@
   <form onsubmit="verificarClave(); return false;">
     <input type="password" id="clave" placeholder="Ingrese la contraseña">
     <button type="submit">Ingresar</button>
+    <button type="button" onclick="window.location.href='index.html'" style="margin-top: 10px; background-color: #777;">Volver al inicio</button>
   </form>
 </div>
 
@@ -124,140 +125,137 @@
   </div>
 
   <script>
-    function verificarClave() {
-      const clave = document.getElementById("clave").value;
-      if (clave === "ARdic@2025") {
-        document.getElementById("loginPanel").style.display = "none";
-        document.getElementById("adminPanel").style.display = "block";
-        cargarDatos();
-      } else {
-        alert("Contraseña incorrecta");
-      }
+  function verificarClave() {
+    const clave = document.getElementById("clave").value;
+    if (clave === "ARdic@2025") {
+      document.getElementById("loginPanel").style.display = "none";
+      document.getElementById("adminPanel").style.display = "block";
+      cargarDatos();
+    } else {
+      alert("Contraseña incorrecta");
+      document.getElementById("clave").value = "";
     }
+  }
 
-    function cargarDatos() {
-      const API_URL = 'https://script.google.com/macros/s/AKfycbyyBhsgzw1ZFib9G4GFwMUHhsPoKY84Hhyn2bx77EgxnmDXt2vBC_LXbtbQP3f0CogX/exec';
-      fetch(API_URL)
-        .then(res => res.json())
-        .then(data => {
-          const tbody = document.querySelector("#tablaTerminos tbody");
-          tbody.innerHTML = "";
+  function cargarDatos() {
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyyBhsgzw1ZFib9G4GFwMUHhsPoKY84Hhyn2bx77EgxnmDXt2vBC_LXbtbQP3f0CogX/exec';
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.querySelector("#tablaTerminos tbody");
+        tbody.innerHTML = "";
 
-          for (const termino in data) {
-            const fila = data[termino];
-            const tr = document.createElement("tr");
+        for (const termino in data) {
+          const fila = data[termino];
+          const tr = document.createElement("tr");
 
-            tr.innerHTML = `
-              <td>${termino}</td>
-              <td>${fila["Traducción"] || ""}</td>
-              <td>${fila["Pronunciación"] || ""}</td>
-              <td>${fila["Categoría"] || ""}</td>
-              <td>${fila["Definición"] || ""}</td>
-              <td>${fila["Sinónimos"] || ""}</td>
-              <td>${fila["Tipo de término"] || ""}</td>
-              <td>${fila["Forma farmacéutica"] || ""}</td>`;
+          tr.innerHTML = `
+            <td>${termino}</td>
+            <td>${fila["Traducción"] || ""}</td>
+            <td>${fila["Pronunciación"] || ""}</td>
+            <td>${fila["Categoría"] || ""}</td>
+            <td>${fila["Definición"] || ""}</td>
+            <td>${fila["Sinónimos"] || ""}</td>
+            <td>${fila["Tipo de término"] || ""}</td>
+            <td>${fila["Forma farmacéutica"] || ""}</td>`;
 
-            const editarBtn = `<button onclick=\"editarFila(this)\">✏️</button>`;
-            const eliminarBtn = `<button onclick=\"eliminarFila(this)\">🗑️</button>`;
-            const acciones = `<td>${editarBtn} ${eliminarBtn}</td>`;
-            tr.innerHTML += acciones;
-            tbody.appendChild(tr);
-          }
-        })
-        .catch(err => {
-          const tbody = document.querySelector("#tablaTerminos tbody");
-          tbody.innerHTML = `<tr><td colspan="9">❌ Error al cargar los términos.</td></tr>`;
-          console.error("Error cargando términos:", err);
-        });
-    }
-
-    function filtrarTabla() {
-      const input = document.getElementById("buscador").value.toLowerCase();
-      const filas = document.querySelectorAll("#tablaTerminos tbody tr");
-      filas.forEach(fila => {
-        const termino = fila.cells[0]?.innerText.toLowerCase() || "";
-        fila.style.display = termino.includes(input) ? "" : "none";
+          const editarBtn = `<button onclick=\"editarFila(this)\">✏️</button>`;
+          const eliminarBtn = `<button onclick=\"eliminarFila(this)\">🗑️</button>`;
+          const acciones = `<td>${editarBtn} ${eliminarBtn}</td>`;
+          tr.innerHTML += acciones;
+          tbody.appendChild(tr);
+        }
+      })
+      .catch(err => {
+        const tbody = document.querySelector("#tablaTerminos tbody");
+        tbody.innerHTML = `<tr><td colspan="9">❌ Error al cargar los términos.</td></tr>`;
+        console.error("Error cargando términos:", err);
       });
+  }
+
+  function filtrarTabla() {
+    const input = document.getElementById("buscador").value.toLowerCase();
+    const filas = document.querySelectorAll("#tablaTerminos tbody tr");
+    filas.forEach(fila => {
+      const termino = fila.cells[0]?.innerText.toLowerCase() || "";
+      fila.style.display = termino.includes(input) ? "" : "none";
+    });
+  }
+
+  function ordenarTabla(columna) {
+    const tabla = document.getElementById("tablaTerminos");
+    let filas = Array.from(tabla.rows).slice(1);
+    let ordenAsc = tabla.getAttribute("data-orden") !== "asc";
+    tabla.setAttribute("data-orden", ordenAsc ? "asc" : "desc");
+
+    filas.sort((a, b) => {
+      const textoA = a.cells[columna].innerText.toLowerCase();
+      const textoB = b.cells[columna].innerText.toLowerCase();
+      return ordenAsc ? textoA.localeCompare(textoB) : textoB.localeCompare(textoA);
+    });
+
+    const tbody = tabla.querySelector("tbody");
+    tbody.innerHTML = "";
+    filas.forEach(f => tbody.appendChild(f));
+  }
+
+  function editarFila(boton) {
+    const fila = boton.parentNode.parentNode;
+    const celdas = fila.querySelectorAll("td");
+    for (let i = 0; i < celdas.length - 1; i++) {
+      const texto = celdas[i].innerText;
+      celdas[i].innerHTML = `<input value="${texto}" style='width: 100%; background-color: #2a2a2a; color: white; border: none; padding: 4px;'>`;
     }
+    boton.textContent = '💾';
+    boton.onclick = () => guardarEdicion(fila);
+  }
 
-    function ordenarTabla(columna) {
-      const tabla = document.getElementById("tablaTerminos");
-      let filas = Array.from(tabla.rows).slice(1);
-      let ordenAsc = tabla.getAttribute("data-orden") !== "asc";
-      tabla.setAttribute("data-orden", ordenAsc ? "asc" : "desc");
+  function guardarEdicion(fila) {
+    const inputs = fila.querySelectorAll("input");
+    const valores = Array.from(inputs).map(input => input.value.trim());
+    const terminoClave = valores[0];
 
-      filas.sort((a, b) => {
-        const textoA = a.cells[columna].innerText.toLowerCase();
-        const textoB = b.cells[columna].innerText.toLowerCase();
-        return ordenAsc ? textoA.localeCompare(textoB) : textoB.localeCompare(textoA);
-      });
+    valores.forEach((valor, i) => {
+      fila.cells[i].innerText = valor;
+    });
 
-      const tbody = tabla.querySelector("tbody");
-      tbody.innerHTML = "";
-      filas.forEach(f => tbody.appendChild(f));
-    }
+    fila.querySelector("button").textContent = '✏️';
+    fila.querySelector("button").onclick = () => editarFila(fila.querySelector("button"));
 
-    function editarFila(boton) {
-      const fila = boton.parentNode.parentNode;
-      const celdas = fila.querySelectorAll("td");
-      for (let i = 0; i < celdas.length - 1; i++) {
-        const texto = celdas[i].innerText;
-        celdas[i].innerHTML = `<input value="${texto}" style='width: 100%; background-color: #2a2a2a; color: white; border: none; padding: 4px;'>`;
-      }
-      boton.textContent = '💾';
-      boton.onclick = () => guardarEdicion(fila);
-    }
-
-    function guardarEdicion(fila) {
-  const inputs = fila.querySelectorAll("input");
-  const valores = Array.from(inputs).map(input => input.value.trim());
-  const terminoClave = valores[0];
-
-  // Reemplazar celdas por texto plano
-  valores.forEach((valor, i) => {
-    fila.cells[i].innerText = valor;
-  });
-
-  fila.querySelector("button").textContent = '✏️';
-  fila.querySelector("button").onclick = () => editarFila(fila.querySelector("button"));
-
-  // Enviar actualización al servidor
-  fetch('https://script.google.com/macros/s/AKfycbyyBhsgzw1ZFib9G4GFwMUHhsPoKY84Hhyn2bx77EgxnmDXt2vBC_LXbtbQP3f0CogX/exec', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      actualizar: true,
-      termino: terminoClave,
-      traduccion: valores[1],
-      pronunciacion: valores[2],
-      categoria: valores[3],
-      definicion: valores[4],
-      sinonimos: valores[5],
-      tipo: valores[6],
-      formaFarmaceutica: valores[7]
-    })
-  })
-  .then(res => res.text())
-  .then(msg => console.log('✅ Actualizado en Google Sheets:', msg))
-  .catch(err => console.error('❌ Error al actualizar en Sheets:', err));
-}
-    }
-
-    function eliminarFila(boton) {
-  const fila = boton.parentNode.parentNode;
-  const termino = fila.cells[0]?.innerText;
-  if (confirm("¿Seguro que deseas eliminar esta fila?")) {
-    fila.remove();
-
-    // Enviar solicitud de eliminación al backend
     fetch('https://script.google.com/macros/s/AKfycbyyBhsgzw1ZFib9G4GFwMUHhsPoKY84Hhyn2bx77EgxnmDXt2vBC_LXbtbQP3f0CogX/exec', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ eliminar: true, termino })
+      body: JSON.stringify({
+        actualizar: true,
+        termino: terminoClave,
+        traduccion: valores[1],
+        pronunciacion: valores[2],
+        categoria: valores[3],
+        definicion: valores[4],
+        sinonimos: valores[5],
+        tipo: valores[6],
+        formaFarmaceutica: valores[7]
+      })
     })
     .then(res => res.text())
-    .then(msg => console.log('🗑️ Eliminado en Google Sheets:', msg))
-    .catch(err => console.error('❌ Error al eliminar en Sheets:', err));
+    .then(msg => console.log('✅ Actualizado en Google Sheets:', msg))
+    .catch(err => console.error('❌ Error al actualizar en Sheets:', err));
+  }
+
+  function eliminarFila(boton) {
+    const fila = boton.parentNode.parentNode;
+    const termino = fila.cells[0]?.innerText;
+    if (confirm("¿Seguro que deseas eliminar esta fila?")) {
+      fila.remove();
+      fetch('https://script.google.com/macros/s/AKfycbyyBhsgzw1ZFib9G4GFwMUHhsPoKY84Hhyn2bx77EgxnmDXt2vBC_LXbtbQP3f0CogX/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eliminar: true, termino })
+      })
+      .then(res => res.text())
+      .then(msg => console.log('🗑️ Eliminado en Google Sheets:', msg))
+      .catch(err => console.error('❌ Error al eliminar en Sheets:', err));
+    }
   }
 </script>
 </body>
