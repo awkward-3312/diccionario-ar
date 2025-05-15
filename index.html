@@ -168,9 +168,32 @@
     .italic { font-style: italic; }
     .pronunciacion { color: #70d6ff; }
     mark { background: #fffd38; color: black; padding: 0 4px; border-radius: 3px; }
+
+    #toggle-modo {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1001;
+      background: #222;
+      border: none;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 50px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: background 0.3s;
+    }
+
+    body.light-mode #toggle-modo {
+      background: #ccc;
+      color: #000;
+    }
   </style>
 </head>
 <body>
+  <button id="toggle-modo" onclick="toggleModo()">🌓</button>
+
   <div class="ventana">
     <h1><span class="azul">Diccionario</span><span class="rojo"> - AR</span></h1>
     <div class="busqueda">
@@ -206,6 +229,22 @@
     let db;
     let glosarioCargado = false;
     let debounceTimer;
+
+    function toggleModo() {
+      const isClaro = document.body.classList.toggle("light-mode");
+      localStorage.setItem("modoClaro", isClaro ? "1" : "0");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("modoClaro") === "1") {
+        document.body.classList.add("light-mode");
+      }
+      abrirBaseDatos();
+      document.getElementById("termino").addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(buscar, 300);
+      });
+    });
 
     function abrirBaseDatos() {
       const request = indexedDB.open("DiccionarioAR", 1);
@@ -300,21 +339,6 @@
       document.getElementById("termino").value = "";
       document.getElementById("resultado").innerText = "Resultado aquí...";
     }
-
-    function toggleModo() {
-      document.body.classList.toggle("light-mode");
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      abrirBaseDatos();
-      document.getElementById("termino").addEventListener("input", () => {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(buscar, 300);
-      });
-      window.addEventListener("load", () => {
-        if (navigator.onLine && db) cargarGlosario(true);
-      });
-    });
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
