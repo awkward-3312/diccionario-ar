@@ -77,10 +77,15 @@
       color: black;
     }
     #adminPanel { display: none; }
+      .azul { color: #1877f2; }
+    .rojo { color: #ff5c39; }
+    tr:nth-child(even) td { background-color: #242424; }
+    button { padding: 8px 16px; font-size: 14px; }
+    input:focus { outline: 2px solid #3ae374; }
   </style>
 </head>
-<body>
-  <h1>Panel de Administración</h1>
+<body onload="document.getElementById('clave').focus()">
+  <h1><span class="azul">PANEL</span> <span class="rojo">ADMIN</span></h1>
   <div class="login" id="loginPanel">
     <form onsubmit="verificarClave(); return false;">
       <input type="password" id="clave" placeholder="Ingrese la contraseña">
