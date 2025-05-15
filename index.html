@@ -28,8 +28,13 @@
     }
 
     body.light-mode {
-      background: #f4f4f4;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.95)),
+        url('fondo-claro.png') no-repeat center center fixed !important;
+      background-size: cover;
+      background-attachment: fixed;
       color: #111;
+      animation: parallax 60s linear infinite;
     }
 
     @keyframes parallax {
@@ -51,7 +56,7 @@
     }
 
     body.light-mode .ventana {
-      background-color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.95);
       color: #111;
     }
 
