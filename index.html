@@ -24,7 +24,7 @@
       align-items: center;
       flex-direction: column;
       animation: parallax 60s linear infinite;
-      transition: background-color 0.3s, color 0.3s;
+      transition: background 0.3s, color 0.3s;
     }
 
     body.light-mode {
@@ -33,8 +33,8 @@
         url('fondo-claro.png') no-repeat center center fixed !important;
       background-size: cover;
       background-attachment: fixed;
-      color: #111;
       animation: parallax 60s linear infinite;
+      color: #111;
     }
 
     @keyframes parallax {
@@ -193,7 +193,6 @@
 </head>
 <body>
   <button id="toggle-modo" onclick="toggleModo()">🌓</button>
-
   <div class="ventana">
     <h1><span class="azul">Diccionario</span><span class="rojo"> - AR</span></h1>
     <div class="busqueda">
@@ -208,7 +207,6 @@
     <div class="botones-busqueda">
       <button onclick="buscar()">Buscar</button>
       <button onclick="limpiarBusqueda()" style="background-color: #444;">Limpiar</button>
-      <button onclick="toggleModo()">🌓</button>
     </div>
 
     <div style="position: fixed; top: 10px; left: 20px; z-index: 1001;">
