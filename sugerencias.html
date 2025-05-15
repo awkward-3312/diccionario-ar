@@ -143,12 +143,10 @@
         mensaje.innerHTML = '<div class="error">⚠️ Por favor escribe una sugerencia antes de enviar.</div>';
         return;
       }
-      fetch(URL_SUGERENCIAS, {
-        method: 'POST',
-        body: JSON.stringify({ sugerencia: texto }),
-        headers: { 'Content-Type': 'application/json' }
+      fetch(URL_SUGERENCIAS + `?sugerencia=${encodeURIComponent(texto)}`, {
+        method: 'GET',
       })
-      .then(res => res.text())
+      .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
       .then(() => {
         mensaje.innerHTML = '<div class="mensaje">💌 Gracias por tu sugerencia. <span class="corazon">❤️</span><br>Agradecemos tus sugerencias para mejorar la plataforma.</div>';
         document.getElementById("sugerencia").value = "";
