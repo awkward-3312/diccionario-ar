@@ -4,8 +4,123 @@
   <meta charset="UTF-8">
   <title>Diccionario - AR</title>
   <style>
-      
-  </style>
+    @font-face {
+      font-family: 'MiddleOfApril';
+      src: url('Middle-of-April.ttf') format('truetype');
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
+        url('FONDOOO.jpeg') no-repeat center center fixed;
+      background-size: cover;
+      background-attachment: fixed;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      animation: parallax 60s linear infinite;
+    }
+
+    @keyframes parallax {
+      0% { background-position: center center; }
+      50% { background-position: center top; }
+      100% { background-position: center center; }
+    }
+
+    .ventana {
+      background-color: #181818;
+      border-radius: 30px;
+      padding: 40px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      position: relative;
+    }
+
+    h1 {
+      font-family: 'MiddleOfApril', cursive;
+      font-size: 3.5rem;
+      margin: 0 0 40px 0;
+      line-height: 1.2;
+      color: #fff;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    input {
+      background: #2a2a2a;
+      color: white;
+    }
+
+    button {
+      background-color: #007acc;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #005f99;
+    }
+
+    #resultado {
+      margin-top: 20px;
+      background-color: #292929;
+      padding: 20px;
+      border-radius: 10px;
+      color: white;
+      text-align: left;
+      white-space: pre-line;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .titulo-resultado {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #3ae374;
+    }
+
+    .sinonimos span {
+      background-color: #333;
+      padding: 4px 8px;
+      margin: 2px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .botones-busqueda {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .botones-busqueda button {
+      width: 120px;
+    }
+
+    .azul { color: #1877f2; }
+    .rojo { color: #ff5c39; }
+    .italic { font-style: italic; }
+    .pronunciacion { color: #70d6ff; }
+</style>
 </head>
 <body>
   <div class="ventana">
@@ -93,9 +208,12 @@
       document.getElementById("resultado").innerText = "Resultado aquí...";
     }
 
-    cargarGlosario();
+    
+      document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("termino").addEventListener("keypress", function(e) {
-      if (e.key === "Enter") buscar();
+        if (e.key === "Enter") buscar();
+      });
+      cargarGlosario();
     });
       
     }
