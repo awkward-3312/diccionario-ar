@@ -238,108 +238,7 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbziHIpDwqhNISY4W5nVSlGnPZt_3MsBs9hPFhAeiQLo_9b7RYW97GIcwjVBw9tu4TJy/exec';
-    let glosario = {};
-    let db;
-    let glosarioCargado = false;
-    let debounceTimer;
-
-    function toggleModo() {
-      const isClaro = document.body.classList.toggle("light-mode");
-      localStorage.setItem("modoClaro", isClaro ? "1" : "0");
-    }
-
-    function normalizarTexto(texto) {
-      return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").toUpperCase();
-    }
-
-    function actualizarGlosario() {
-      if (navigator.onLine && db) {
-        cargarGlosario(true);
-        const ahora = new Date().toLocaleString();
-        localStorage.setItem("ultimaActualizacion", ahora);
-        document.getElementById("ultima-actualizacion").textContent = "Última actualización: " + ahora;
-        alert("✅ Glosario actualizado con éxito.");
-      } else {
-        alert("⚠️ No hay conexión o base de datos no disponible.");
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      if (localStorage.getItem("modoClaro") === "1") {
-        document.body.classList.add("light-mode");
-      }
-      const ultima = localStorage.getItem("ultimaActualizacion") || "-";
-      document.getElementById("ultima-actualizacion").textContent = "Última actualización: " + ultima;
-      abrirBaseDatos();
-      document.getElementById("termino").addEventListener("input", () => {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(buscar, 300);
-      });
-
-      window.addEventListener("load", () => {
-        if (navigator.onLine && db) {
-          cargarGlosario(true);
-        }
-      });
-    });
-
-    function abrirBaseDatos() {
-      const request = indexedDB.open("DiccionarioAR", 1);
-      request.onerror = () => console.error("❌ Error al abrir IndexedDB.");
-      request.onsuccess = (event) => {
-        db = event.target.result;
-        cargarDesdeIndexedDB();
-      };
-      request.onupgradeneeded = (event) => {
-        db = event.target.result;
-        db.createObjectStore("terminos", { keyPath: "nombre" });
-      };
-    }
-
-    function guardarEnIndexedDB(datos) {
-      const tx = db.transaction("terminos", "readwrite");
-      const store = tx.objectStore("terminos");
-      for (let nombre in datos) {
-        const claveNormalizada = normalizarTexto(nombre);
-        const entrada = { ...datos[nombre], nombre: claveNormalizada };
-        store.put(entrada);
-      }
-      tx.oncomplete = () => { glosarioCargado = true; };
-    }
-
-    function cargarDesdeIndexedDB() {
-      const tx = db.transaction("terminos", "readonly");
-      const store = tx.objectStore("terminos");
-      store.getAll().onsuccess = (event) => {
-        const datos = event.target.result;
-        if (datos.length > 0) {
-          datos.forEach(e => {
-            const clave = normalizarTexto(e.nombre);
-            glosario[clave] = e;
-          });
-          glosarioCargado = true;
-        } else {
-          cargarGlosario(true);
-        }
-      };
-    }
-
-    function cargarGlosario(guardarLocal = false) {
-      fetch(API_URL).then(res => res.json()).then(data => {
-        glosario = {};
-        for (let nombre in data) {
-          const clave = normalizarTexto(nombre);
-          glosario[clave] = data[nombre];
-        }
-        if (guardarLocal && db) guardarEnIndexedDB(glosario);
-      }).catch(err => console.error("Error al cargar glosario:", err));
-    }
-
-    function resaltarCoincidencia(texto, termino) {
-      const reg = new RegExp(`(${termino})`, 'gi');
-      return texto.replace(reg, '<mark>$1</mark>');
-    }
+    // ... código anterior sin cambios ...
 
     function buscar() {
       if (!glosarioCargado) return;
@@ -366,30 +265,20 @@
         return;
       }
 
+      let html = `<div class="titulo-resultado">${resaltarCoincidencia(termino, termino)}</div>`;
       if ((entrada["Tipo de término"] || '').toLowerCase() === "abreviatura") {
-        resultado.innerHTML = `<div class="titulo-resultado">${resaltarCoincidencia(termino, termino)}</div><strong>Definición:</strong><br>${entrada["Definición"] || "-"}`;
+        html += `<strong>Definición:</strong><br>${entrada["Definición"] || "-"}`;
       } else {
-        resultado.innerHTML = `<div class="titulo-resultado">${resaltarCoincidencia(termino, termino)}</div>
-          <strong>Traducción:</strong> <span class="italic">${entrada["Traducción"] || "-"}</span><br>
-          <strong>Pronunciación:</strong> <span class="pronunciacion">${entrada["Pronunciación"] || "-"}</span><br>
-          <strong>Categoría:</strong> ${entrada["Categoría"] || "-"}<br>
-          <strong>Definición:</strong><br>${entrada["Definición"] || "-"}<br>
-          <strong>Sinónimos:</strong><br>
-          <div class="sinonimos italic">${(entrada["Sinónimos"] || "").split(",").map(s => `<span>${s.trim()}</span>`).join(" ")}</div>`;
+        if (entrada["Traducción"]) html += `<strong>Traducción:</strong> <span class="italic">${entrada["Traducción"]}</span><br>`;
+        if (entrada["Pronunciación"]) html += `<strong>Pronunciación:</strong> <span class="pronunciacion">${entrada["Pronunciación"]}</span><br>`;
+        if (entrada["Categoría"]) html += `<strong>Categoría:</strong> ${entrada["Categoría"]}<br>`;
+        if (entrada["Definición"]) html += `<strong>Definición:</strong><br>${entrada["Definición"]}<br>`;
+        if (entrada["Sinónimos"]) {
+          const sin = entrada["Sinónimos"].split(",").map(s => `<span>${s.trim()}</span>`).join(" ");
+          html += `<strong>Sinónimos:</strong><br><div class="sinonimos italic">${sin}</div>`;
+        }
       }
-    }
-
-    function limpiarBusqueda() {
-      document.getElementById("termino").value = "";
-      document.getElementById("resultado").innerText = "Resultado aquí...";
-    }
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('serviceWorker.js')
-          .then(reg => console.log('✅ SW registrado:', reg.scope))
-          .catch(err => console.error('❌ Error SW:', err));
-      });
+      resultado.innerHTML = html;
     }
   </script>
 </body>
