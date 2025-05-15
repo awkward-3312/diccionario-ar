@@ -76,17 +76,17 @@
   </style>
 </head>
 <body>
-  <div class="formulario">
+  <form class="formulario" method="POST" action="https://script.google.com/macros/s/AKfycbziHIpDwqhNISY4W5nVSlGnPZt_3MsBs9hPFhAeiQLo_9b7RYW97GIcwjVBw9tu4TJy/exec">
     <h1>Nuevo Término</h1>
-    <input type="text" id="inputTermino" placeholder="Término">
-    <input type="text" id="inputTraduccion" placeholder="Traducción">
-    <input type="text" id="inputPronunciacion" placeholder="Pronunciación">
-    <input type="text" id="inputCategoria" placeholder="Categoría">
-    <textarea id="inputDefinicion" placeholder="Definición"></textarea>
-    <input type="text" id="inputSinonimos" placeholder="Sinónimos (separados por comas)">
-    <input type="text" id="inputFormaFarmaceutica" placeholder="Forma farmacéutica">
+    <input type="text" name="termino" placeholder="Término" required>
+    <input type="text" name="traduccion" placeholder="Traducción">
+    <input type="text" name="pronunciacion" placeholder="Pronunciación">
+    <input type="text" name="categoria" placeholder="Categoría">
+    <textarea name="definicion" placeholder="Definición"></textarea>
+    <input type="text" name="sinonimos" placeholder="Sinónimos (separados por comas)">
+    <input type="text" name="formaFarmaceutica" placeholder="Forma farmacéutica">
 
-    <select id="selectTipo" onchange="toggleCamposFormulario()">
+    <select name="tipo" required>
       <option value="">Tipo de término</option>
       <option value="abreviatura">Abreviatura</option>
       <option value="término completo">Término completo</option>
@@ -94,90 +94,9 @@
     </select>
 
     <div class="botones">
-      <button onclick="enviarTermino()">Guardar</button>
-      <button onclick="window.location.href='index.html'" style="background-color: #777;">Volver</button>
+      <button type="submit">Guardar</button>
+      <button type="button" onclick="window.location.href='index.html'" style="background-color: #777;">Volver</button>
     </div>
-  </div>
-
-  <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbziHIpDwqhNISY4W5nVSlGnPZt_3MsBs9hPFhAeiQLo_9b7RYW97GIcwjVBw9tu4TJy/exec';
-
-    function toggleCamposFormulario() {
-      const tipo = document.getElementById("selectTipo").value;
-      document.getElementById("inputTermino").style.display = (tipo === "abreviatura" || tipo === "término completo") ? "block" : "none";
-      document.getElementById("inputTraduccion").style.display = (tipo === "término completo" || tipo === "forma farmacéutica") ? "block" : "none";
-      document.getElementById("inputPronunciacion").style.display = (tipo === "término completo") ? "block" : "none";
-      document.getElementById("inputCategoria").style.display = (tipo === "término completo" || tipo === "forma farmacéutica") ? "block" : "none";
-      document.getElementById("inputDefinicion").style.display = (tipo === "abreviatura" || tipo === "término completo") ? "block" : "none";
-      document.getElementById("inputSinonimos").style.display = (tipo === "término completo") ? "block" : "none";
-      document.getElementById("inputFormaFarmaceutica").style.display = (tipo === "forma farmacéutica") ? "block" : "none";
-    }
-
-    function enviarTermino() {
-  const tipo = document.getElementById("selectTipo").value;
-  let nuevoTermino = {
-    termino: '',
-    traduccion: '',
-    pronunciacion: '',
-    categoria: '',
-    definicion: '',
-    sinonimos: '',
-    tipo: tipo,
-    formaFarmaceutica: ''
-  };
-
-  if (tipo === "abreviatura") {
-    nuevoTermino.termino = document.getElementById("inputTermino").value.trim();
-    nuevoTermino.definicion = document.getElementById("inputDefinicion").value.trim();
-  } else if (tipo === "término completo") {
-    nuevoTermino.termino = document.getElementById("inputTermino").value.trim();
-    nuevoTermino.traduccion = document.getElementById("inputTraduccion").value.trim();
-    nuevoTermino.pronunciacion = document.getElementById("inputPronunciacion").value.trim();
-    nuevoTermino.categoria = document.getElementById("inputCategoria").value.trim();
-    nuevoTermino.definicion = document.getElementById("inputDefinicion").value.trim();
-    nuevoTermino.sinonimos = document.getElementById("inputSinonimos").value.trim();
-  } else if (tipo === "forma farmacéutica") {
-    nuevoTermino.termino = document.getElementById("inputFormaFarmaceutica").value.trim();
-    nuevoTermino.traduccion = document.getElementById("inputTraduccion").value.trim();
-    nuevoTermino.categoria = document.getElementById("inputCategoria").value.trim();
-  } else {
-    alert("Por favor selecciona un tipo de término válido.");
-    return;
-  }
-
-  // Asegura que todos los campos estén
-  nuevoTermino = {
-    termino: nuevoTermino.termino || '',
-    traduccion: nuevoTermino.traduccion || '',
-    pronunciacion: nuevoTermino.pronunciacion || '',
-    categoria: nuevoTermino.categoria || '',
-    definicion: nuevoTermino.definicion || '',
-    sinonimos: nuevoTermino.sinonimos || '',
-    tipo: nuevoTermino.tipo || '',
-    formaFarmaceutica: nuevoTermino.formaFarmaceutica || ''
-  };
-
-  console.log("Enviando a backend:", nuevoTermino); // <- esto lo puedes ver en consola del navegador
-
-  fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(nuevoTermino)
-  })
-  .then(res => res.json())
-  .then(data => {
-    alert(data.mensaje || "✅ Término agregado");
-    window.location.href = 'index.html';
-  })
-  .catch(err => {
-    console.error("Error al enviar término:", err);
-    alert("❌ Error al agregar término");
-  });
-}
-
-
-    // Ejecutar al cargar para establecer visibilidad inicial
-    window.onload = toggleCamposFormulario;
-  </script>
+  </form>
 </body>
 </html>
