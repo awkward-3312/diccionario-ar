@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Sugerencias - Diccionario AR</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #dbeafe, #f0f9ff);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .formulario {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    h2 {
+      color: #1e3a8a;
+      margin-bottom: 20px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      margin: 10px 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .enviar {
+      background-color: #10b981;
+      color: white;
+    }
+    .enviar:hover {
+      background-color: #059669;
+    }
+    .volver {
+      background-color: #d1d5db;
+      color: #111;
+    }
+    .volver:hover {
+      background-color: #9ca3af;
+    }
+    .mensaje {
+      margin-top: 20px;
+      color: #10b981;
+      font-weight: bold;
+      display: none;
+    }
+    .corazon {
+      display: inline-block;
+      color: #ef4444;
+      animation: latir 1s infinite;
+    }
+    @keyframes latir {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+  </style>
+</head>
+<body>
+  <div class="formulario">
+    <h2>Envíanos tu sugerencia</h2>
+    <input type="text" id="nombre" placeholder="Tu nombre (opcional)">
+    <textarea id="mensaje" rows="4" placeholder="Escribe tu sugerencia aquí..."></textarea>
+    <div>
+      <button class="volver" onclick="window.location.href='index.html'">Regresar</button>
+      <button class="enviar" onclick="enviarSugerencia()">Enviar</button>
+    </div>
+    <div class="mensaje" id="mensajeConfirmacion">
+      ✅ Enviado exitosamente. Agradecemos tus sugerencias para mejorar la plataforma <span class="corazon">❤️</span>
+    </div>
+  </div>
+  <script>
+    function enviarSugerencia() {
+      const mensaje = document.getElementById("mensaje").value.trim();
+      if (mensaje === "") {
+        alert("Por favor escribe una sugerencia antes de enviar.");
+        return;
+      }
+      document.getElementById("mensajeConfirmacion").style.display = "block";
+      document.getElementById("mensaje").value = "";
+      document.getElementById("nombre").value = "";
+    }
+  </script>
+</body>
+</html>
