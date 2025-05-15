@@ -4,129 +4,145 @@
   <meta charset="UTF-8">
   <title>Agregar Término - Diccionario AR</title>
   <style>
-    @font-face {
-      font-family: 'MiddleOfApril';
-      src: url('Middle-of-April.ttf') format('truetype');
-    }
-
     body {
-      margin: 0;
-      padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      background:
-        linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
-        url('FONDOOO.jpeg') no-repeat center center fixed;
-      background-size: cover;
-      background-attachment: fixed;
-      height: 100vh;
+      background-color: #111;
+      color: #f1f1f1;
+      margin: 0;
+      padding: 40px;
       display: flex;
       justify-content: center;
-      align-items: center;
-      flex-direction: column;
+      align-items: flex-start;
+      min-height: 100vh;
     }
-
     .formulario {
-      background-color: #181818;
-      border-radius: 30px;
-      padding: 40px;
-      width: 90%;
-      max-width: 700px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-      color: white;
-    }
-
-    h1 {
-      font-family: 'MiddleOfApril', cursive;
-      color: #3ae374;
-      text-align: center;
-      text-transform: uppercase;
-      font-size: 2.5rem;
-      margin-bottom: 30px;
-    }
-
-    input, select, textarea, button {
+      background-color: #1e1e1e;
+      padding: 30px;
+      border-radius: 20px;
       width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 16px;
-      border: none;
+      max-width: 600px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    h2 {
+      text-align: center;
+      color: #3ae374;
+      font-family: 'MiddleOfApril', cursive;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    select, input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
       border-radius: 8px;
-      box-sizing: border-box;
-      background: #2a2a2a;
+      border: none;
+      font-size: 16px;
+    }
+    input, textarea, select {
+      background-color: #2a2a2a;
       color: white;
     }
-
     button {
       background-color: #007acc;
+      color: white;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s;
     }
-
     button:hover {
       background-color: #005f99;
-    }
-
-    .botones {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    #popup {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #3ae374;
-      color: black;
-      padding: 15px 25px;
-      border-radius: 10px;
-      font-weight: bold;
-      z-index: 1000;
-      display: none;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
   </style>
 </head>
 <body>
-  <div id="popup">✅ Término enviado exitosamente</div>
+  <div class="formulario">
+    <h2>AGREGAR TÉRMINO</h2>
+    <form id="formulario">
+      <select id="tipo" required onchange="mostrarCampos()">
+        <option value="">Seleccione tipo</option>
+        <option value="abreviatura">Abreviatura</option>
+        <option value="termino">Término</option>
+        <option value="forma">Forma farmacéutica</option>
+      </select>
 
-  <form class="formulario" id="formulario" method="POST" action="https://script.google.com/macros/s/AKfycbyyBhsgzw1ZFib9G4GFwMUHhsPoKY84Hhyn2bx77EgxnmDXt2vBC_LXbtbQP3f0CogX/exec" target="dummyFrame">
-    <h1>Nuevo Término</h1>
-    <input type="text" name="termino" placeholder="Término" required>
-    <input type="text" name="traduccion" placeholder="Traducción">
-    <input type="text" name="pronunciacion" placeholder="Pronunciación">
-    <input type="text" name="categoria" placeholder="Categoría">
-    <textarea name="definicion" placeholder="Definición"></textarea>
-    <input type="text" name="sinonimos" placeholder="Sinónimos (separados por comas)">
-    <input type="text" name="formaFarmaceutica" placeholder="Forma farmacéutica">
+      <input type="text" id="termino" placeholder="Término o abreviatura" required>
+      <input type="text" id="traduccion" placeholder="Traducción">
+      <input type="text" id="pronunciacion" placeholder="Pronunciación">
+      <input type="text" id="categoria" placeholder="Categoría gramatical">
+      <textarea id="definicion" placeholder="Definición"></textarea>
+      <input type="text" id="sinonimos" placeholder="Sinónimos (separados por coma)">
 
-    <select name="tipo" required>
-      <option value="">Tipo de término</option>
-      <option value="abreviatura">Abreviatura</option>
-      <option value="término completo">Término completo</option>
-      <option value="forma farmacéutica">Forma farmacéutica</option>
-    </select>
-
-    <div class="botones">
       <button type="submit">Guardar</button>
-      <button type="button" onclick="window.location.href='index.html'" style="background-color: #777;">Volver</button>
-    </div>
-  </form>
-
-  <iframe name="dummyFrame" style="display:none" onload="mostrarPopupYResetear()"></iframe>
+      <button type="button" onclick="window.location.href='index.html'">Cancelar</button>
+    </form>
+    <p id="mensaje" style="text-align:center; margin-top:10px;"></p>
+  </div>
 
   <script>
-    function mostrarPopupYResetear() {
-      const popup = document.getElementById("popup");
-      popup.style.display = "block";
+    const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbxpPfIquRCEF7G4ua2p1QXXs_hsv2LrdSU-fg07uCuzfnJ14sOmmtYdQWBJzCmZ_r4S/exec';
 
-      setTimeout(() => {
-        popup.style.display = "none";
-        document.getElementById("formulario").reset();
-      }, 2000);
+    document.getElementById('formulario').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const tipo = document.getElementById('tipo').value;
+      const termino = document.getElementById('termino').value.trim();
+      const traduccion = document.getElementById('traduccion').value.trim();
+      const pronunciacion = document.getElementById('pronunciacion').value.trim();
+      const categoria = document.getElementById('categoria').value.trim();
+      const definicion = document.getElementById('definicion').value.trim();
+      const sinonimos = document.getElementById('sinonimos').value.trim();
+
+      const datos = {
+        termino,
+        tipo,
+        traduccion: tipo === 'forma' ? traduccion : traduccion,
+        pronunciacion: tipo === 'termino' ? pronunciacion : '',
+        categoria: tipo === 'forma' ? categoria : categoria,
+        definicion,
+        sinonimos: tipo === 'termino' ? sinonimos : '',
+        formaFarmaceutica: tipo === 'forma' ? termino : ''
+      };
+
+      fetch(URL_SCRIPT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(datos)
+      })
+      .then(res => res.text())
+      .then(msg => {
+        document.getElementById('mensaje').textContent = msg;
+        document.getElementById('formulario').reset();
+        document.getElementById('traduccion').style.display = 'block';
+        document.getElementById('pronunciacion').style.display = 'block';
+        document.getElementById('categoria').style.display = 'block';
+        document.getElementById('definicion').style.display = 'block';
+        document.getElementById('sinonimos').style.display = 'block';
+      })
+      .catch(err => {
+        document.getElementById('mensaje').textContent = '❌ Error al enviar';
+        console.error(err);
+      });
+    });
+
+    function mostrarCampos() {
+      const tipo = document.getElementById('tipo').value;
+      const campos = {
+        traduccion: document.getElementById('traduccion'),
+        pronunciacion: document.getElementById('pronunciacion'),
+        categoria: document.getElementById('categoria'),
+        definicion: document.getElementById('definicion'),
+        sinonimos: document.getElementById('sinonimos')
+      };
+
+      for (const campo in campos) campos[campo].style.display = 'none';
+
+      if (tipo === 'abreviatura') {
+        campos.definicion.style.display = 'block';
+      } else if (tipo === 'termino') {
+        for (const campo in campos) campos[campo].style.display = 'block';
+      } else if (tipo === 'forma') {
+        campos.traduccion.style.display = 'block';
+        campos.categoria.style.display = 'block';
+      }
     }
   </script>
 </body>
