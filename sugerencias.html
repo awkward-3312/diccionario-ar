@@ -118,6 +118,7 @@
       color: white;
     }
     body.light-mode .error {
+      background-color: #ffd2d2;
       color: #111;
     }
   </style>
@@ -143,8 +144,12 @@
         mensaje.innerHTML = '<div class="error">⚠️ Por favor escribe una sugerencia antes de enviar.</div>';
         return;
       }
-      fetch(URL_SUGERENCIAS + `?sugerencia=${encodeURIComponent(texto)}`, {
-        method: 'GET',
+      const formData = new FormData();
+      formData.append("sugerencia", texto);
+
+      fetch(URL_SUGERENCIAS, {
+        method: 'POST',
+        body: formData,
       })
       .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
       .then(() => {
