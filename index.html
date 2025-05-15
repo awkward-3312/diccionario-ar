@@ -138,11 +138,25 @@
     <div id="resultado">Resultado aquí...</div>
   </div>
 
-  <!-- ... formulario y otros scripts iguales ... -->
-
   <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbziHIpDwqhNISY4W5nVSlGnPZt_3MsBs9hPFhAeiQLo_9b7RYW97GIcwjVBw9tu4TJy/exec';
+
+    let glosario = {};
+
     function normalizarTexto(texto) {
       return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").toUpperCase();
+    }
+
+    function cargarGlosario() {
+      fetch(API_URL)
+        .then(res => res.json())
+        .then(data => {
+          glosario = data;
+          console.log("Términos cargados:", glosario);
+        })
+        .catch(err => {
+          console.error("Error al cargar glosario:", err);
+        });
     }
 
     function buscar() {
@@ -154,40 +168,34 @@
         return;
       }
 
-      fetch("https://script.google.com/macros/s/AKfycbz3liKdqW3Q1sH-ngtSZp-FIo-z3l1d6eLM_EVmyQk-Et9ScVaNDGXtT1xsbnbfRl9v/exec")
-        .then(res => res.json())
-        .then(data => {
-          const entrada = data.find(item => normalizarTexto(item.nombre) === termino);
-          if (!entrada) {
-            resultado.innerText = "Término no encontrado.";
-            return;
-          }
+      const entrada = glosario[termino];
+      if (!entrada) {
+        resultado.innerText = "Término no encontrado.";
+        return;
+      }
 
-          if (entrada.tipo === "abreviatura") {
-            resultado.innerHTML = `
-              <div class="titulo-resultado">${entrada.nombre}</div>
-              <strong>Definición:</strong><br>${entrada.definicion || "-"}`;
-          } else {
-            resultado.innerHTML = `
-              <div class="titulo-resultado">${entrada.nombre}</div>
-              <strong>Traducción:</strong> ${entrada.ingles || "-"}<br>
-              <strong>Pronunciación:</strong> ${entrada.pronunciacion || "-"}<br>
-              <strong>Categoría:</strong> ${entrada.categoria || "-"}<br>
-              <strong>Definición:</strong><br>${entrada.definicion || "-"}<br>
-              <strong>Sinónimos:</strong><br>
-              <div class="sinonimos">${(entrada.sinonimos || "").split(",").map(s => `<span>${s.trim()}</span>`).join(" ")}</div>`;
-          }
-        })
-        .catch(err => {
-          resultado.innerText = "❌ Error al consultar términos.";
-          console.error("Error al consultar la hoja:", err);
-        });
+      if ((entrada["Tipo de término"] || '').toLowerCase() === "abreviatura") {
+        resultado.innerHTML = `
+          <div class="titulo-resultado">${termino}</div>
+          <strong>Definición:</strong><br>${entrada["Definición"] || "-"}`;
+      } else {
+        resultado.innerHTML = `
+          <div class="titulo-resultado">${termino}</div>
+          <strong>Traducción:</strong> ${entrada["Traducción"] || "-"}<br>
+          <strong>Pronunciación:</strong> ${entrada["Pronunciación"] || "-"}<br>
+          <strong>Categoría:</strong> ${entrada["Categoría"] || "-"}<br>
+          <strong>Definición:</strong><br>${entrada["Definición"] || "-"}<br>
+          <strong>Sinónimos:</strong><br>
+          <div class="sinonimos">${(entrada["Sinónimos"] || "").split(",").map(s => `<span>${s.trim()}</span>`).join(" ")}</div>`;
+      }
     }
 
     function limpiarBusqueda() {
       document.getElementById("termino").value = "";
       document.getElementById("resultado").innerText = "Resultado aquí...";
     }
+
+    cargarGlosario();
   </script>
 </body>
 </html>
