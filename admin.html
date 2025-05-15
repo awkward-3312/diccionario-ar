@@ -29,8 +29,8 @@
       margin-bottom: 30px;
     }
 
-    .login {
-      max-width: 400px;
+    .contenedor, .login {
+      max-width: 1000px;
       margin: 0 auto;
       background-color: #1e1e1e;
       padding: 30px;
@@ -38,53 +38,187 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
 
-    input, button {
+    #buscador, .login input {
+      margin-bottom: 20px;
       width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      font-size: 16px;
-      border: none;
+      padding: 10px;
       border-radius: 8px;
-      box-sizing: border-box;
-    }
-
-    input {
+      border: none;
       background-color: #2a2a2a;
       color: white;
+      font-size: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #444;
+      text-align: left;
+    }
+
+    th {
+      background-color: #007acc;
+      color: white;
+      cursor: pointer;
+    }
+
+    td {
+      background-color: #2a2a2a;
     }
 
     button {
-      background-color: #007acc;
+      background-color: #444;
       color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s;
+      margin-top: 20px;
     }
 
     button:hover {
-      background-color: #005f99;
+      background-color: #3ae374;
+      color: black;
     }
+
+    #adminPanel { display: none; }
   </style>
 </head>
 <body>
   <h1>Panel de Administración</h1>
-  <div class="login">
-    <input type="text" id="usuario" placeholder="Usuario">
-    <input type="password" id="contrasena" placeholder="Contraseña">
-    <button onclick="ingresarAdmin()">Ingresar</button>
-    <button onclick="window.location.href='index.html'" style="background-color:#444;">Volver</button>
+
+  <div class="login" id="loginPanel">
+    <input type="password" id="clave" placeholder="Ingrese la contraseña">
+    <button onclick="verificarClave()">Ingresar</button>
+  </div>
+
+  <div class="contenedor" id="adminPanel">
+    <input type="text" id="buscador" placeholder="Buscar por término..." onkeyup="filtrarTabla()">
+
+    <table id="tablaTerminos">
+      <thead>
+        <tr>
+          <th onclick="ordenarTabla(0)">Término</th>
+          <th onclick="ordenarTabla(1)">Traducción</th>
+          <th onclick="ordenarTabla(2)">Pronunciación</th>
+          <th onclick="ordenarTabla(3)">Categoría</th>
+          <th onclick="ordenarTabla(4)">Definición</th>
+          <th onclick="ordenarTabla(5)">Sinónimos</th>
+          <th onclick="ordenarTabla(6)">Tipo</th>
+          <th onclick="ordenarTabla(7)">Forma farmacéutica</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="9" style="text-align:center;">Cargando términos...</td></tr>
+      </tbody>
+    </table>
+    <button onclick="window.location.href='index.html'">Volver al inicio</button>
   </div>
 
   <script>
-    function ingresarAdmin() {
-      const usuario = document.getElementById("usuario").value.trim();
-      const contrasena = document.getElementById("contrasena").value.trim();
-
-      if (usuario === "admin" && contrasena === "admin123") {
-        alert("Acceso concedido.");
-        // Redirigir a otra página de administración si la tienes
+    function verificarClave() {
+      const clave = document.getElementById("clave").value;
+      if (clave === "ARdic@2025") {
+        document.getElementById("loginPanel").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+        cargarDatos();
       } else {
-        alert("Usuario o contraseña incorrectos.");
+        alert("Contraseña incorrecta");
+      }
+    }
+
+    function cargarDatos() {
+      const API_URL = 'https://script.google.com/macros/s/AKfycbyyBhsgzw1ZFib9G4GFwMUHhsPoKY84Hhyn2bx77EgxnmDXt2vBC_LXbtbQP3f0CogX/exec';
+      fetch(API_URL)
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.querySelector("#tablaTerminos tbody");
+          tbody.innerHTML = "";
+
+          for (const termino in data) {
+            const fila = data[termino];
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+              <td>${termino}</td>
+              <td>${fila["Traducción"] || ""}</td>
+              <td>${fila["Pronunciación"] || ""}</td>
+              <td>${fila["Categoría"] || ""}</td>
+              <td>${fila["Definición"] || ""}</td>
+              <td>${fila["Sinónimos"] || ""}</td>
+              <td>${fila["Tipo de término"] || ""}</td>
+              <td>${fila["Forma farmacéutica"] || ""}</td>`;
+
+            const editarBtn = `<button onclick=\"editarFila(this)\">✏️</button>`;
+            const eliminarBtn = `<button onclick=\"eliminarFila(this)\">🗑️</button>`;
+            const acciones = `<td>${editarBtn} ${eliminarBtn}</td>`;
+            tr.innerHTML += acciones;
+            tbody.appendChild(tr);
+          }
+        })
+        .catch(err => {
+          const tbody = document.querySelector("#tablaTerminos tbody");
+          tbody.innerHTML = `<tr><td colspan="9">❌ Error al cargar los términos.</td></tr>`;
+          console.error("Error cargando términos:", err);
+        });
+    }
+
+    function filtrarTabla() {
+      const input = document.getElementById("buscador").value.toLowerCase();
+      const filas = document.querySelectorAll("#tablaTerminos tbody tr");
+      filas.forEach(fila => {
+        const termino = fila.cells[0]?.innerText.toLowerCase() || "";
+        fila.style.display = termino.includes(input) ? "" : "none";
+      });
+    }
+
+    function ordenarTabla(columna) {
+      const tabla = document.getElementById("tablaTerminos");
+      let filas = Array.from(tabla.rows).slice(1);
+      let ordenAsc = tabla.getAttribute("data-orden") !== "asc";
+      tabla.setAttribute("data-orden", ordenAsc ? "asc" : "desc");
+
+      filas.sort((a, b) => {
+        const textoA = a.cells[columna].innerText.toLowerCase();
+        const textoB = b.cells[columna].innerText.toLowerCase();
+        return ordenAsc ? textoA.localeCompare(textoB) : textoB.localeCompare(textoA);
+      });
+
+      const tbody = tabla.querySelector("tbody");
+      tbody.innerHTML = "";
+      filas.forEach(f => tbody.appendChild(f));
+    }
+
+    function editarFila(boton) {
+      const fila = boton.parentNode.parentNode;
+      const celdas = fila.querySelectorAll("td");
+      for (let i = 0; i < celdas.length - 1; i++) {
+        const texto = celdas[i].innerText;
+        celdas[i].innerHTML = `<input value="${texto}" style='width: 100%; background-color: #2a2a2a; color: white; border: none; padding: 4px;'>`;
+      }
+      boton.textContent = '💾';
+      boton.onclick = () => guardarEdicion(fila);
+    }
+
+    function guardarEdicion(fila) {
+      const inputs = fila.querySelectorAll("input");
+      inputs.forEach((input, i) => {
+        fila.cells[i].innerText = input.value.trim();
+      });
+      fila.querySelector("button").textContent = '✏️';
+      fila.querySelector("button").onclick = () => editarFila(fila.querySelector("button"));
+    }
+
+    function eliminarFila(boton) {
+      const fila = boton.parentNode.parentNode;
+      if (confirm("¿Seguro que deseas eliminar esta fila?")) {
+        fila.remove();
       }
     }
   </script>
