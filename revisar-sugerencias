@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Revisar Sugerencias - Diccionario AR</title>
+  <style>
+    @font-face {
+      font-family: 'MiddleOfApril';
+      src: url('Middle-of-April.ttf') format('truetype');
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Segoe UI', sans-serif;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0.95)),
+        url('FONDOOO.jpeg') no-repeat center center fixed;
+      background-size: cover;
+      background-attachment: fixed;
+      color: #f1f1f1;
+    }
+    h1 {
+      font-family: 'MiddleOfApril', cursive;
+      font-size: 3rem;
+      color: #3ae374;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .contenedor {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: #1e1e1e;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #444;
+      text-align: left;
+    }
+    th {
+      background-color: #007acc;
+      color: white;
+    }
+    td {
+      background-color: #2a2a2a;
+    }
+    tr:nth-child(even) td {
+      background-color: #242424;
+    }
+    button {
+      background-color: #444;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background-color: #3ae374;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <h1><span class="azul">Sugerencias</span> <span class="rojo">Recibidas</span></h1>
+  <div class="contenedor">
+    <table id="tablaSugerencias">
+      <thead>
+        <tr><th>Fecha</th><th>Sugerencia</th></tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="2" style="text-align:center;">Cargando sugerencias...</td></tr>
+      </tbody>
+    </table>
+    <button onclick="window.location.href='admin.html'">Volver al panel</button>
+  </div>
+
+  <script>
+    const SUGERENCIAS_URL = 'https://script.google.com/macros/s/AKfycbxCYqKvptGIwAaVN9ylHKD1MeCMF3qCmqqjtRGmF7JTuQsitLxWleDsrq9aN8IywEiu/exec';
+
+    fetch(SUGERENCIAS_URL)
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.querySelector('#tablaSugerencias tbody');
+        tbody.innerHTML = '';
+
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;">No hay sugerencias disponibles.</td></tr>';
+          return;
+        }
+
+        data.forEach(s => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${s.fecha}</td><td>${s.sugerencia}</td>`;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        document.querySelector('#tablaSugerencias tbody').innerHTML = '<tr><td colspan="2">❌ Error al cargar sugerencias.</td></tr>';
+        console.error('Error al obtener sugerencias:', err);
+      });
+  </script>
+</body>
+</html>
