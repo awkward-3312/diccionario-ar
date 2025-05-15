@@ -94,9 +94,11 @@
   <h1>Panel de Administración</h1>
 
   <div class="login" id="loginPanel">
+  <form onsubmit="verificarClave(); return false;">
     <input type="password" id="clave" placeholder="Ingrese la contraseña">
-    <button onclick="verificarClave()">Ingresar</button>
-  </div>
+    <button type="submit">Ingresar</button>
+  </form>
+</div>
 
   <div class="contenedor" id="adminPanel">
     <input type="text" id="buscador" placeholder="Buscar por término..." onkeyup="filtrarTabla()">
