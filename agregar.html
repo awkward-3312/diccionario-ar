@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <title>Agregar Término - Diccionario AR</title>
   <style>
+    @font-face {
+      font-family: 'MiddleOfApril';
+      src: url('Middle-of-April.ttf') format('truetype');
+    }
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #111;
@@ -51,11 +55,13 @@
     button:hover {
       background-color: #005f99;
     }
+      .azul { color: #1877f2; }
+    .rojo { color: #ff5c39; }
   </style>
 </head>
 <body>
   <div class="formulario">
-    <h2>AGREGAR TÉRMINO</h2>
+    <h2><span class="azul">AGREGAR</span> <span class="rojo">TÉRMINO</span></h2>
     <form id="formulario">
       <select id="tipo" required onchange="mostrarCampos()">
         <option value="">Seleccione tipo</option>
@@ -104,14 +110,17 @@
 
       fetch(URL_SCRIPT, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(datos)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
       })
       .then(res => res.text())
       .then(msg => {
-        document.getElementById('mensaje').textContent = msg;
+        const popup = document.getElementById('popupMsg');
+        popup.textContent = msg;
+        popup.style.display = 'block';
+        setTimeout(() => popup.style.display = 'none', 2000);
         document.getElementById('formulario').reset();
-        document.getElementById('traduccion').style.display = 'block';
+        mostrarCampos();
         document.getElementById('pronunciacion').style.display = 'block';
         document.getElementById('categoria').style.display = 'block';
         document.getElementById('definicion').style.display = 'block';
@@ -145,5 +154,6 @@
       }
     }
   </script>
+<div id="popupMsg" style="display:none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #3ae374; color: black; padding: 12px 24px; border-radius: 10px; font-weight: bold; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">✅ Término agregado correctamente</div>
 </body>
 </html>
