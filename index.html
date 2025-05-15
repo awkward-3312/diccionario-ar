@@ -200,6 +200,15 @@
     body.light-mode #toggle-modo::before {
       transform: translateX(30px);
     }
+
+    #ultima-actualizacion {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #ccc;
+    }
+    body.light-mode #ultima-actualizacion {
+      color: #444;
+    }
   </style>
 </head>
 <body>
@@ -212,7 +221,9 @@
     <div class="botones-busqueda">
       <button onclick="buscar()">Buscar</button>
       <button onclick="limpiarBusqueda()" style="background-color: #444;">Limpiar</button>
+      <button onclick="actualizarGlosario()" style="background-color: #3ae374;">🔄 Actualizar</button>
     </div>
+    <div id="ultima-actualizacion">Última actualización: -</div>
 
     <div style="position: fixed; top: 10px; left: 20px; z-index: 1001;">
       <button onclick="window.location.href='agregar.html'">Agregar Término</button>
@@ -242,14 +253,34 @@
       return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").toUpperCase();
     }
 
+    function actualizarGlosario() {
+      if (navigator.onLine && db) {
+        cargarGlosario(true);
+        const ahora = new Date().toLocaleString();
+        localStorage.setItem("ultimaActualizacion", ahora);
+        document.getElementById("ultima-actualizacion").textContent = "Última actualización: " + ahora;
+        alert("✅ Glosario actualizado con éxito.");
+      } else {
+        alert("⚠️ No hay conexión o base de datos no disponible.");
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       if (localStorage.getItem("modoClaro") === "1") {
         document.body.classList.add("light-mode");
       }
+      const ultima = localStorage.getItem("ultimaActualizacion") || "-";
+      document.getElementById("ultima-actualizacion").textContent = "Última actualización: " + ultima;
       abrirBaseDatos();
       document.getElementById("termino").addEventListener("input", () => {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(buscar, 300);
+      });
+
+      window.addEventListener("load", () => {
+        if (navigator.onLine && db) {
+          cargarGlosario(true);
+        }
       });
     });
 
@@ -271,7 +302,8 @@
       const store = tx.objectStore("terminos");
       for (let nombre in datos) {
         const claveNormalizada = normalizarTexto(nombre);
-        store.put({ nombre: claveNormalizada, ...datos[nombre] });
+        const entrada = { ...datos[nombre], nombre: claveNormalizada };
+        store.put(entrada);
       }
       tx.oncomplete = () => { glosarioCargado = true; };
     }
