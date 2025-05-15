@@ -73,10 +73,27 @@
       gap: 10px;
       margin-top: 20px;
     }
+
+    #popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #3ae374;
+      color: black;
+      padding: 15px 25px;
+      border-radius: 10px;
+      font-weight: bold;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
   </style>
 </head>
 <body>
-  <form class="formulario" method="POST" action="https://script.google.com/macros/s/AKfycbziHIpDwqhNISY4W5nVSlGnPZt_3MsBs9hPFhAeiQLo_9b7RYW97GIcwjVBw9tu4TJy/exec">
+  <div id="popup">✅ Término enviado exitosamente</div>
+
+  <form class="formulario" id="formulario" method="POST" action="https://script.google.com/macros/s/AKfycbziHIpDwqhNISY4W5nVSlGnPZt_3MsBs9hPFhAeiQLo_9b7RYW97GIcwjVBw9tu4TJy/exec" target="dummyFrame">
     <h1>Nuevo Término</h1>
     <input type="text" name="termino" placeholder="Término" required>
     <input type="text" name="traduccion" placeholder="Traducción">
@@ -98,5 +115,19 @@
       <button type="button" onclick="window.location.href='index.html'" style="background-color: #777;">Volver</button>
     </div>
   </form>
+
+  <iframe name="dummyFrame" style="display:none" onload="mostrarPopupYResetear()"></iframe>
+
+  <script>
+    function mostrarPopupYResetear() {
+      const popup = document.getElementById("popup");
+      popup.style.display = "block";
+
+      setTimeout(() => {
+        popup.style.display = "none";
+        document.getElementById("formulario").reset();
+      }, 2000);
+    }
+  </script>
 </body>
 </html>
