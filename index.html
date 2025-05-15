@@ -135,6 +135,17 @@
       margin: 2px;
       border-radius: 6px;
       display: inline-block;
+      color: white;
+    }
+    body.light-mode .sinonimos span {
+      background-color: #bbb;
+      color: #000;
+    }
+    .pronunciacion {
+      color: #70d6ff;
+    }
+    body.light-mode .pronunciacion {
+      color: #003366;
     }
     .botones-busqueda {
       display: flex;
@@ -147,7 +158,6 @@
     .azul { color: #1877f2; }
     .rojo { color: #ff5c39; }
     .italic { font-style: italic; }
-    .pronunciacion { color: #70d6ff; }
     mark { background: #fffd38; color: black; padding: 0 4px; border-radius: 3px; }
     #toggle-modo {
       position: fixed;
@@ -182,6 +192,19 @@
     }
     body.light-mode #ultima-actualizacion {
       color: #444;
+    }
+    .sugerencias button {
+      background-color: #444;
+      color: white;
+      border-radius: 20px;
+      padding: 6px 12px;
+      margin: 4px;
+      cursor: pointer;
+      border: none;
+    }
+    body.light-mode .sugerencias button {
+      background-color: #ccc;
+      color: #000;
     }
   </style>
 </head>
@@ -304,25 +327,26 @@
 
       const entrada = glosario[termino];
       if (!entrada) {
-        resultado.innerText = "⚠️ Término no encontrado.";
+        resultado.innerHTML = "⚠️ Término no encontrado.";
         const sugerencias = Object.keys(glosario).filter(key => key.includes(termino));
         if (sugerencias.length > 0) {
-          resultado.innerHTML += `<br><br><em>¿Quisiste decir?:</em><br>${sugerencias.slice(0,3).map(s => s).join(', ')}`;
+          const sugerenciaHTML = sugerencias.slice(0, 3).map(s => `<button onclick=\"document.getElementById('termino').value='${s}';buscar();\">${s}</button>`).join(" ");
+          resultado.innerHTML += `<br><br><em>¿Quisiste decir?:</em><br><div class='sugerencias'>${sugerenciaHTML}</div>`;
         }
         return;
       }
 
-      let html = `<div class="titulo-resultado">${termino}</div>`;
+      let html = `<div class=\"titulo-resultado\">${termino}</div>`;
       if ((entrada["Tipo de término"] || '').toLowerCase() === "abreviatura") {
         html += `<strong>Definición:</strong><br>${entrada["Definición"] || "-"}`;
       } else {
-        if (entrada["Traducción"]) html += `<strong>Traducción:</strong> <span class="italic">${entrada["Traducción"]}</span><br>`;
-        if (entrada["Pronunciación"]) html += `<strong>Pronunciación:</strong> <span class="pronunciacion">${entrada["Pronunciación"]}</span><br>`;
+        if (entrada["Traducción"]) html += `<strong>Traducción:</strong> <span class=\"italic\">${entrada["Traducción"]}</span><br>`;
+        if (entrada["Pronunciación"]) html += `<strong>Pronunciación:</strong> <span class=\"pronunciacion\">${entrada["Pronunciación"]}</span><br>`;
         if (entrada["Categoría"]) html += `<strong>Categoría:</strong> ${entrada["Categoría"]}<br>`;
         if (entrada["Definición"]) html += `<strong>Definición:</strong><br>${entrada["Definición"]}<br>`;
         if (entrada["Sinónimos"]) {
           const sin = entrada["Sinónimos"].split(",").map(s => `<span>${s.trim()}</span>`).join(" ");
-          html += `<strong>Sinónimos:</strong><br><div class="sinonimos italic">${sin}</div>`;
+          html += `<strong>Sinónimos:</strong><br><div class=\"sinonimos italic\">${sin}</div>`;
         }
       }
       resultado.innerHTML = html;
