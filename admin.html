@@ -77,11 +77,16 @@
       color: black;
     }
     #adminPanel { display: none; }
-      .azul { color: #1877f2; }
+    .azul { color: #1877f2; }
     .rojo { color: #ff5c39; }
     tr:nth-child(even) td { background-color: #242424; }
     button { padding: 8px 16px; font-size: 14px; }
     input:focus { outline: 2px solid #3ae374; }
+    .ver-sugerencias {
+      background-color: #ff69b4;
+      color: white;
+      margin-left: 10px;
+    }
   </style>
 </head>
 <body onload="document.getElementById('clave').focus()">
@@ -114,6 +119,7 @@
       </tbody>
     </table>
     <button onclick="window.location.href='index.html'">Volver al inicio</button>
+    <button class="ver-sugerencias" onclick="window.location.href='revisar-sugerencias.html'">📬 Ver sugerencias</button>
   </div>
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzAzMs8JEWCQM0fzZobajM3iozSpTVnyS8mDtJuccWVmeu-rg4M3ed41fXWXEEBpz8/exec';
