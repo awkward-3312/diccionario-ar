@@ -244,6 +244,10 @@
       localStorage.setItem("modoClaro", isClaro ? "1" : "0");
     }
 
+    function normalizarTexto(texto) {
+      return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").toUpperCase();
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       if (localStorage.getItem("modoClaro") === "1") {
         document.body.classList.add("light-mode");
@@ -271,7 +275,10 @@
     function guardarEnIndexedDB(datos) {
       const tx = db.transaction("terminos", "readwrite");
       const store = tx.objectStore("terminos");
-      for (let nombre in datos) store.put({ nombre, ...datos[nombre] });
+      for (let nombre in datos) {
+        const claveNormalizada = normalizarTexto(nombre);
+        store.put({ nombre: claveNormalizada, ...datos[nombre] });
+      }
       tx.oncomplete = () => { glosarioCargado = true; };
     }
 
@@ -281,7 +288,10 @@
       store.getAll().onsuccess = (event) => {
         const datos = event.target.result;
         if (datos.length > 0) {
-          datos.forEach(e => glosario[e.nombre] = e);
+          datos.forEach(e => {
+            const clave = normalizarTexto(e.nombre);
+            glosario[clave] = e;
+          });
           glosarioCargado = true;
         } else {
           cargarGlosario(true);
@@ -291,13 +301,13 @@
 
     function cargarGlosario(guardarLocal = false) {
       fetch(API_URL).then(res => res.json()).then(data => {
-        glosario = data;
-        if (guardarLocal && db) guardarEnIndexedDB(data);
+        glosario = {};
+        for (let nombre in data) {
+          const clave = normalizarTexto(nombre);
+          glosario[clave] = data[nombre];
+        }
+        if (guardarLocal && db) guardarEnIndexedDB(glosario);
       }).catch(err => console.error("Error al cargar glosario:", err));
-    }
-
-    function normalizarTexto(texto) {
-      return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").toUpperCase();
     }
 
     function resaltarCoincidencia(texto, termino) {
