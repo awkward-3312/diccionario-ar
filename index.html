@@ -134,6 +134,10 @@
     #ayudaTexto.mostrar {
       animation: ayudaAnim 0.3s ease-out;
     }
+      #ayudaTexto:hover, #ayudaBtn:hover + #ayudaTexto {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
   </style>
 </head>
 <body>
@@ -226,21 +230,43 @@
       document.getElementById("termino").addEventListener("keypress", function(e) {
       if (e.key === "Enter") buscar();
     });
-      function toggleAyuda() {
-      const ayuda = document.getElementById("ayudaTexto");
-      if (ayuda.style.display === "none") {
-        ayuda.classList.add("mostrar");
-        ayuda.style.display = "block";
-      } else {
+      // Eliminada la función toggleAyuda porque ahora se activa por hover else {
         ayuda.style.display = "none";
         ayuda.classList.remove("mostrar");
       }
     }
+      let ayudaTimeout;
+    const ayudaBtn = document.getElementById("ayudaBtn");
+    const ayudaTexto = document.getElementById("ayudaTexto");
+
+    ayudaBtn.addEventListener("mouseenter", () => {
+      clearTimeout(ayudaTimeout);
+      ayudaTexto.style.opacity = "1";
+      ayudaTexto.style.visibility = "visible";
+    });
+
+    ayudaBtn.addEventListener("mouseleave", () => {
+      ayudaTimeout = setTimeout(() => {
+        ayudaTexto.style.opacity = "0";
+        ayudaTexto.style.visibility = "hidden";
+      }, 1000);
+    });
+
+    ayudaTexto.addEventListener("mouseenter", () => {
+      clearTimeout(ayudaTimeout);
+    });
+
+    ayudaTexto.addEventListener("mouseleave", () => {
+      ayudaTimeout = setTimeout(() => {
+        ayudaTexto.style.opacity = "0";
+        ayudaTexto.style.visibility = "hidden";
+      }, 1000);
+    });
   </script>
   <div style="position: fixed; bottom: 20px; left: 20px;">
-    <button onclick="toggleAyuda()" style="border-radius: 50%; background: #ff5c39; color: white; width: 45px; height: 45px; font-size: 20px;">?</button>
+    <button id="ayudaBtn" style="border-radius: 50%; background: #ff5c39; color: white; width: 45px; height: 45px; font-size: 20px;">?</button>
   </div>
-  <div id="ayudaTexto" style="display: none; position: fixed; bottom: 80px; left: 20px; background: #333; color: white; padding: 10px 15px; border-radius: 10px; width: 200px; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.5); z-index: 1000;">
+  <div id="ayudaTexto" style="opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; position: fixed; bottom: 80px; left: 20px; background: #333; color: white; padding: 10px 15px; border-radius: 10px; width: 200px; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.5); z-index: 1000;">
     Ejemplo: <br>• paracetamol <br>• AINES <br>• cápsula blanda
   </div>
 </body>
