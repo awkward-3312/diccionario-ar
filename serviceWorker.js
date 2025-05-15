@@ -22,11 +22,21 @@ self.addEventListener("install", (event) => {
 
 // Responder desde caché o desde red si no está en caché
 self.addEventListener("fetch", (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
-  );
+  if (event.request.mode === "navigate") {
+    // Si es navegación (recarga o ingreso directo)
+    event.respondWith(
+      caches.match("/index.html").then((cachedResponse) => {
+        return cachedResponse || fetch(event.request);
+      })
+    );
+  } else {
+    // Para otros recursos (fuente, imagen, script)
+    event.respondWith(
+      caches.match(event.request).then((response) => {
+        return response || fetch(event.request);
+      })
+    );
+  }
 });
 
 // Activar: eliminar versiones antiguas del caché si existieran
