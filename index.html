@@ -150,6 +150,7 @@
     let glosario = {};
     let db;
     let glosarioCargado = false;
+    let debounceTimer;
 
     function abrirBaseDatos() {
       const request = indexedDB.open("DiccionarioAR", 1);
@@ -221,7 +222,6 @@
 
     function buscar() {
       if (!glosarioCargado) {
-        alert("⏳ Cargando datos, por favor espera un momento...");
         return;
       }
       const terminoInput = document.getElementById("termino");
@@ -269,13 +269,14 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       abrirBaseDatos();
-      document.getElementById("termino").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") buscar();
+      document.getElementById("termino").addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(buscar, 300);
       });
 
       window.addEventListener("load", () => {
         if (navigator.onLine && db) {
-          console.log("🌐 Conexión detectada. Actualizando glosario desde Google Sheets...");
+          console.log("🌐 Conexión detectada. Actualizando glosario...");
           cargarGlosario(true);
         } else {
           console.log("⚠️ Sin conexión. Usando datos guardados localmente.");
