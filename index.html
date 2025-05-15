@@ -177,25 +177,33 @@
       bottom: 20px;
       right: 20px;
       z-index: 1001;
-      background: #222;
-      border: none;
-      color: white;
-      padding: 8px 12px;
+      width: 60px;
+      height: 30px;
+      background: linear-gradient(to right, #d16ba5, #c777b9);
       border-radius: 30px;
-      font-size: 18px;
+      border: none;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      transition: background 0.3s;
     }
 
-    body.light-mode #toggle-modo {
-      background: #ccc;
-      color: #000;
+    #toggle-modo::before {
+      content: '';
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      top: 2px;
+      left: 2px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+    }
+
+    body.light-mode #toggle-modo::before {
+      transform: translateX(30px);
     }
   </style>
 </head>
 <body>
-  <button id="toggle-modo" onclick="toggleModo()">🌓</button>
+  <button id="toggle-modo" onclick="toggleModo()"></button>
   <div class="ventana">
     <h1><span class="azul">Diccionario</span><span class="rojo"> - AR</span></h1>
     <div class="busqueda">
