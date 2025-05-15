@@ -125,6 +125,15 @@
     #resultado.mostrar {
       animation: fadeIn 0.4s ease-out;
     }
+      .italic { font-style: italic; }
+    .pronunciacion { color: #70d6ff; }
+      @keyframes ayudaAnim {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    #ayudaTexto.mostrar {
+      animation: ayudaAnim 0.3s ease-out;
+    }
   </style>
 </head>
 <body>
@@ -199,12 +208,12 @@
         resultado.innerHTML = `<div class="titulo-resultado">${termino}</div><strong>Definición:</strong><br>${entrada["Definición"] || "-"}`;
       } else {
         resultado.innerHTML = `<div class="titulo-resultado">${termino}</div>
-          <strong>Traducción:</strong> ${entrada["Traducción"] || "-"}<br>
-          <strong>Pronunciación:</strong> ${entrada["Pronunciación"] || "-"}<br>
+          <strong>Traducción:</strong> <span class="italic">${entrada["Traducción"] || "-"}</span><br>
+          <strong>Pronunciación:</strong> <span class="pronunciacion">${entrada["Pronunciación"] || "-"}</span><br>
           <strong>Categoría:</strong> ${entrada["Categoría"] || "-"}<br>
           <strong>Definición:</strong><br>${entrada["Definición"] || "-"}<br>
           <strong>Sinónimos:</strong><br>
-          <div class="sinonimos">${(entrada["Sinónimos"] || "").split(",").map(s => `<span>${s.trim()}</span>`).join(" ")}</div>`;
+          <div class="sinonimos italic">${(entrada["Sinónimos"] || "").split(",").map(s => `<span>${s.trim()}</span>`).join(" ")}</div>`;
       }
     }
 
@@ -217,6 +226,22 @@
       document.getElementById("termino").addEventListener("keypress", function(e) {
       if (e.key === "Enter") buscar();
     });
+      function toggleAyuda() {
+      const ayuda = document.getElementById("ayudaTexto");
+      if (ayuda.style.display === "none") {
+        ayuda.classList.add("mostrar");
+        ayuda.style.display = "block";
+      } else {
+        ayuda.style.display = "none";
+        ayuda.classList.remove("mostrar");
+      }
+    }
   </script>
+  <div style="position: fixed; bottom: 20px; left: 20px;">
+    <button onclick="toggleAyuda()" style="border-radius: 50%; background: #ff5c39; color: white; width: 45px; height: 45px; font-size: 20px;">?</button>
+  </div>
+  <div id="ayudaTexto" style="display: none; position: fixed; bottom: 80px; left: 20px; background: #333; color: white; padding: 10px 15px; border-radius: 10px; width: 200px; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.5); z-index: 1000;">
+    Ejemplo: <br>• paracetamol <br>• AINES <br>• cápsula blanda
+  </div>
 </body>
 </html>
