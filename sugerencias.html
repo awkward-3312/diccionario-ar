@@ -8,28 +8,27 @@
       font-family: 'MiddleOfApril';
       src: url('Middle-of-April.ttf') format('truetype');
     }
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('FONDOOO.jpeg') no-repeat center center fixed;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
+        url('FONDOOO.jpeg') no-repeat center center fixed;
       background-size: cover;
       background-attachment: fixed;
+      height: 100vh;
+      margin: 0;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       flex-direction: column;
+      color: white;
       animation: parallax 60s linear infinite;
-      transition: background 0.3s, color 0.3s;
     }
     body.light-mode {
-      background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.95)), url('fondo-claro.png') no-repeat center center fixed;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.95)),
+        url('fondo-claro.png') no-repeat center center fixed;
       background-size: cover;
-      background-attachment: fixed;
-      animation: parallax 60s linear infinite;
       color: #111;
     }
     @keyframes parallax {
@@ -39,13 +38,12 @@
     }
     .ventana {
       background-color: #181818;
-      border-radius: 30px;
-      padding: 40px;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      max-width: 500px;
       width: 90%;
-      max-width: 700px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
       text-align: center;
-      transition: background-color 0.3s;
     }
     body.light-mode .ventana {
       background-color: rgba(255, 255, 255, 0.95);
@@ -53,87 +51,119 @@
     }
     h1 {
       font-family: 'MiddleOfApril', cursive;
-      font-size: 3.5rem;
+      font-size: 3rem;
+      margin-bottom: 20px;
       color: #fff;
     }
     body.light-mode h1 {
       color: #111;
     }
-    textarea, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      box-sizing: border-box;
-    }
     textarea {
-      background: #2a2a2a;
-      color: white;
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: none;
       resize: none;
-      height: 150px;
+      margin-bottom: 20px;
+      background-color: #2a2a2a;
+      color: white;
     }
     body.light-mode textarea {
-      background: #ddd;
+      background-color: #ddd;
       color: #111;
     }
     button {
-      background-color: #007acc;
-      color: white;
-      font-weight: bold;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      margin: 10px 5px;
       cursor: pointer;
-      transition: background 0.3s;
+      font-weight: bold;
     }
-    button:hover {
-      background-color: #005f99;
+    .enviar {
+      background-color: #3ae374;
+      color: black;
     }
-    #mensaje {
+    .volver {
+      background-color: #444;
+      color: white;
+    }
+    .mensaje {
       margin-top: 20px;
-      font-size: 1.1rem;
-      display: none;
+      font-size: 1rem;
+      opacity: 0;
+      animation: aparecer 1s ease forwards;
     }
-    #mensaje span {
-      animation: latido 1s infinite;
+    @keyframes aparecer {
+      to { opacity: 1; }
+    }
+    .corazon {
       display: inline-block;
+      animation: latido 1s infinite;
+      color: red;
+      font-size: 1.5rem;
     }
     @keyframes latido {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.3); }
     }
+    .error {
+      color: white;
+      background-color: #ff5c39;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    body.light-mode .error {
+      color: #111;
+    }
   </style>
 </head>
 <body>
   <div class="ventana">
-    <h1>💡 Sugerencias</h1>
-    <textarea id="sugerencia" placeholder="Escribe tu sugerencia aquí..."></textarea>
-    <button onclick="enviarSugerencia()">Enviar</button>
-    <button onclick="window.location.href='index.html'">Regresar al inicio</button>
+    <h1>Sugerencias</h1>
+    <textarea id="sugerencia" placeholder="Escribe aquí tu sugerencia..."></textarea>
+    <div>
+      <button class="enviar" onclick="enviarSugerencia()">Enviar</button>
+      <button class="volver" onclick="window.location.href='index.html'">Regresar</button>
+    </div>
     <div id="mensaje"></div>
   </div>
+
   <script>
-    const SUGERENCIAS_URL = 'https://script.google.com/macros/s/AKfycbxCYqKvptGIwAaVN9ylHKD1MeCMF3qCmqqjtRGmF7JTuQsitLxWleDsrq9aN8IywEiu/exec';
+    const URL_SUGERENCIAS = "https://script.google.com/macros/s/AKfycbxCYqKvptGIwAaVN9ylHKD1MeCMF3qCmqqjtRGmF7JTuQsitLxWleDsrq9aN8IywEiu/exec";
 
     function enviarSugerencia() {
-      const texto = document.getElementById('sugerencia').value.trim();
-      const mensaje = document.getElementById('mensaje');
+      const texto = document.getElementById("sugerencia").value.trim();
+      const mensaje = document.getElementById("mensaje");
       if (!texto) {
-        mensaje.style.display = 'block';
-        mensaje.innerText = 'Por favor escribe una sugerencia.';
+        mensaje.innerHTML = '<div class="error">⚠️ Por favor escribe una sugerencia antes de enviar.</div>';
         return;
       }
-      fetch(SUGERENCIAS_URL + '?sugerencia=' + encodeURIComponent(texto))
-        .then(response => response.ok ? response.text() : Promise.reject())
-        .then(() => {
-          mensaje.style.display = 'block';
-          mensaje.innerHTML = '💌 <span>¡Sugerencia enviada exitosamente!</span><br>Gracias por ayudarnos a mejorar la plataforma ❤️';
-          document.getElementById('sugerencia').value = '';
-        })
-        .catch(() => {
-          mensaje.style.display = 'block';
-          mensaje.innerText = 'Hubo un error al enviar la sugerencia. Inténtalo más tarde.';
-        });
+      fetch(URL_SUGERENCIAS, {
+        method: 'POST',
+        body: JSON.stringify({ sugerencia: texto }),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => res.text())
+      .then(() => {
+        mensaje.innerHTML = '<div class="mensaje">💌 Gracias por tu sugerencia. <span class="corazon">❤️</span><br>Agradecemos tus sugerencias para mejorar la plataforma.</div>';
+        document.getElementById("sugerencia").value = "";
+      })
+      .catch(err => {
+        mensaje.innerHTML = '<div class="error">❌ Error al enviar sugerencia.</div>';
+        console.error(err);
+      });
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("modoClaro") === "1") {
+        document.body.classList.add("light-mode");
+      }
+    });
   </script>
 </body>
 </html>
