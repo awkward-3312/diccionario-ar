@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Agregar Término - Diccionario AR</title>
+  <style>
+    @font-face {
+      font-family: 'MiddleOfApril';
+      src: url('Middle-of-April.ttf') format('truetype');
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
+        url('FONDOOO.jpeg') no-repeat center center fixed;
+      background-size: cover;
+      background-attachment: fixed;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .formulario {
+      background-color: #181818;
+      border-radius: 30px;
+      padding: 40px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      color: white;
+    }
+
+    h1 {
+      font-family: 'MiddleOfApril', cursive;
+      color: #3ae374;
+      text-align: center;
+      text-transform: uppercase;
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      box-sizing: border-box;
+      background: #2a2a2a;
+      color: white;
+    }
+
+    button {
+      background-color: #007acc;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #005f99;
+    }
+
+    .botones {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="formulario">
+    <h1>Nuevo Término</h1>
+    <input type="text" id="inputTermino" placeholder="Término">
+    <input type="text" id="inputTraduccion" placeholder="Traducción">
+    <input type="text" id="inputPronunciacion" placeholder="Pronunciación">
+    <input type="text" id="inputCategoria" placeholder="Categoría">
+    <textarea id="inputDefinicion" placeholder="Definición"></textarea>
+    <input type="text" id="inputSinonimos" placeholder="Sinónimos (separados por comas)">
+    <input type="text" id="inputFormaFarmaceutica" placeholder="Forma farmacéutica">
+
+    <select id="selectTipo" onchange="toggleCamposFormulario()">
+      <option value="">Tipo de término</option>
+      <option value="abreviatura">Abreviatura</option>
+      <option value="término completo">Término completo</option>
+      <option value="forma farmacéutica">Forma farmacéutica</option>
+    </select>
+
+    <div class="botones">
+      <button onclick="enviarTermino()">Guardar</button>
+      <button onclick="window.location.href='index.html'" style="background-color: #777;">Volver</button>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbziHIpDwqhNISY4W5nVSlGnPZt_3MsBs9hPFhAeiQLo_9b7RYW97GIcwjVBw9tu4TJy/exec';
+
+    function toggleCamposFormulario() {
+      const tipo = document.getElementById("selectTipo").value;
+      document.getElementById("inputTermino").style.display = (tipo === "abreviatura" || tipo === "término completo") ? "block" : "none";
+      document.getElementById("inputTraduccion").style.display = (tipo === "término completo" || tipo === "forma farmacéutica") ? "block" : "none";
+      document.getElementById("inputPronunciacion").style.display = (tipo === "término completo") ? "block" : "none";
+      document.getElementById("inputCategoria").style.display = (tipo === "término completo" || tipo === "forma farmacéutica") ? "block" : "none";
+      document.getElementById("inputDefinicion").style.display = (tipo === "abreviatura" || tipo === "término completo") ? "block" : "none";
+      document.getElementById("inputSinonimos").style.display = (tipo === "término completo") ? "block" : "none";
+      document.getElementById("inputFormaFarmaceutica").style.display = (tipo === "forma farmacéutica") ? "block" : "none";
+    }
+
+    function enviarTermino() {
+      const tipo = document.getElementById("selectTipo").value;
+      let nuevoTermino = {
+        termino: '',
+        traduccion: '',
+        pronunciacion: '',
+        categoria: '',
+        definicion: '',
+        sinonimos: '',
+        tipo: tipo,
+        formaFarmaceutica: ''
+      };
+
+      if (tipo === "abreviatura") {
+        nuevoTermino.termino = document.getElementById("inputTermino").value.trim();
+        nuevoTermino.definicion = document.getElementById("inputDefinicion").value.trim();
+      } else if (tipo === "término completo") {
+        nuevoTermino.termino = document.getElementById("inputTermino").value.trim();
+        nuevoTermino.traduccion = document.getElementById("inputTraduccion").value.trim();
+        nuevoTermino.pronunciacion = document.getElementById("inputPronunciacion").value.trim();
+        nuevoTermino.categoria = document.getElementById("inputCategoria").value.trim();
+        nuevoTermino.definicion = document.getElementById("inputDefinicion").value.trim();
+        nuevoTermino.sinonimos = document.getElementById("inputSinonimos").value.trim();
+      } else if (tipo === "forma farmacéutica") {
+        nuevoTermino.termino = document.getElementById("inputFormaFarmaceutica").value.trim();
+        nuevoTermino.traduccion = document.getElementById("inputTraduccion").value.trim();
+        nuevoTermino.categoria = document.getElementById("inputCategoria").value.trim();
+      } else {
+        alert("Por favor selecciona un tipo de término válido.");
+        return;
+      }
+
+      nuevoTermino = {
+        termino: nuevoTermino.termino || '',
+        traduccion: nuevoTermino.traduccion || '',
+        pronunciacion: nuevoTermino.pronunciacion || '',
+        categoria: nuevoTermino.categoria || '',
+        definicion: nuevoTermino.definicion || '',
+        sinonimos: nuevoTermino.sinonimos || '',
+        tipo: nuevoTermino.tipo || '',
+        formaFarmaceutica: nuevoTermino.formaFarmaceutica || ''
+      };
+
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevoTermino)
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.mensaje);
+        window.location.href = 'index.html';
+      })
+      .catch(err => {
+        console.error("Error al enviar término:", err);
+        alert("❌ Error al agregar término");
+      });
+    }
+
+    // Ejecutar al cargar para establecer visibilidad inicial
+    window.onload = toggleCamposFormulario;
+  </script>
+</body>
+</html>
