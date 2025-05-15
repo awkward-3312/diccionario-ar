@@ -8,13 +8,11 @@
       font-family: 'MiddleOfApril';
       src: url('Middle-of-April.ttf') format('truetype');
     }
-
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
     }
-
     body {
       font-family: 'Segoe UI', sans-serif;
       background:
@@ -29,7 +27,6 @@
       animation: parallax 60s linear infinite;
       transition: background 0.3s, color 0.3s;
     }
-
     body.light-mode {
       background:
         linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.95)),
@@ -39,13 +36,11 @@
       animation: parallax 60s linear infinite;
       color: #111;
     }
-
     @keyframes parallax {
       0% { background-position: center center; }
       50% { background-position: center top; }
       100% { background-position: center center; }
     }
-
     .ventana {
       background-color: #181818;
       border-radius: 30px;
@@ -57,12 +52,10 @@
       position: relative;
       transition: background-color 0.3s;
     }
-
     body.light-mode .ventana {
       background-color: rgba(255, 255, 255, 0.95);
       color: #111;
     }
-
     h1 {
       font-family: 'MiddleOfApril', cursive;
       font-size: 3.5rem;
@@ -70,11 +63,9 @@
       line-height: 1.2;
       color: #fff;
     }
-
     body.light-mode h1 {
       color: #111;
     }
-
     input, button {
       width: 100%;
       padding: 12px;
@@ -84,17 +75,14 @@
       border-radius: 8px;
       box-sizing: border-box;
     }
-
     input {
       background: #2a2a2a;
       color: white;
     }
-
     body.light-mode input {
       background: #ddd;
       color: #111;
     }
-
     button {
       background-color: #007acc;
       color: white;
@@ -102,11 +90,9 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-
     button:hover {
       background-color: #005f99;
     }
-
     #resultado {
       margin-top: 20px;
       background-color: #292929;
@@ -119,12 +105,10 @@
       font-size: 15px;
       line-height: 1.6;
     }
-
     body.light-mode #resultado {
       background-color: #e9e9e9;
       color: #111;
     }
-
     .spinner {
       border: 4px solid #333;
       border-top: 4px solid #3ae374;
@@ -135,19 +119,16 @@
       margin: 10px auto;
       display: none;
     }
-
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
     .titulo-resultado {
       font-size: 1.2rem;
       font-weight: bold;
       margin-bottom: 8px;
       color: #3ae374;
     }
-
     .sinonimos span {
       background-color: #333;
       padding: 4px 8px;
@@ -155,23 +136,19 @@
       border-radius: 6px;
       display: inline-block;
     }
-
     .botones-busqueda {
       display: flex;
       justify-content: center;
       gap: 10px;
     }
-
     .botones-busqueda button {
       width: 120px;
     }
-
     .azul { color: #1877f2; }
     .rojo { color: #ff5c39; }
     .italic { font-style: italic; }
     .pronunciacion { color: #70d6ff; }
     mark { background: #fffd38; color: black; padding: 0 4px; border-radius: 3px; }
-
     #toggle-modo {
       position: fixed;
       bottom: 20px;
@@ -184,7 +161,6 @@
       border: none;
       cursor: pointer;
     }
-
     #toggle-modo::before {
       content: '';
       position: absolute;
@@ -196,11 +172,9 @@
       border-radius: 50%;
       transition: transform 0.3s ease;
     }
-
     body.light-mode #toggle-modo::before {
       transform: translateX(30px);
     }
-
     #ultima-actualizacion {
       margin-top: 10px;
       font-size: 0.85rem;
@@ -224,21 +198,94 @@
       <button onclick="actualizarGlosario()" style="background-color: #3ae374;">🔄 Actualizar</button>
     </div>
     <div id="ultima-actualizacion">Última actualización: -</div>
-
     <div style="position: fixed; top: 10px; left: 20px; z-index: 1001;">
       <button onclick="window.location.href='agregar.html'">Agregar Término</button>
     </div>
-
     <div style="position: fixed; top: 10px; right: 20px; z-index: 1001;">
       <button onclick="window.location.href='admin.html'">Admin</button>
     </div>
-
     <div class="spinner" id="spinner"></div>
     <div id="resultado">Resultado aquí...</div>
   </div>
-
   <script>
-    // ... código anterior sin cambios ...
+    const API_URL = 'https://script.google.com/macros/s/AKfycbziHIpDwqhNISY4W5nVSlGnPZt_3MsBs9hPFhAeiQLo_9b7RYW97GIcwjVBw9tu4TJy/exec';
+    let glosario = {};
+    let db;
+    let glosarioCargado = false;
+    let debounceTimer;
+
+    function toggleModo() {
+      const isClaro = document.body.classList.toggle("light-mode");
+      localStorage.setItem("modoClaro", isClaro ? "1" : "0");
+    }
+
+    function normalizarTexto(texto) {
+      return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").toUpperCase();
+    }
+
+    function abrirBaseDatos() {
+      const request = indexedDB.open("DiccionarioAR", 1);
+      request.onerror = () => console.error("❌ Error al abrir IndexedDB.");
+      request.onsuccess = (event) => {
+        db = event.target.result;
+        cargarDesdeIndexedDB();
+      };
+      request.onupgradeneeded = (event) => {
+        db = event.target.result;
+        db.createObjectStore("terminos", { keyPath: "nombre" });
+      };
+    }
+
+    function guardarEnIndexedDB(datos) {
+      const tx = db.transaction("terminos", "readwrite");
+      const store = tx.objectStore("terminos");
+      for (let nombre in datos) {
+        const claveNormalizada = normalizarTexto(nombre);
+        const entrada = { ...datos[nombre], nombre: claveNormalizada };
+        store.put(entrada);
+      }
+      tx.oncomplete = () => { glosarioCargado = true; };
+    }
+
+    function cargarDesdeIndexedDB() {
+      const tx = db.transaction("terminos", "readonly");
+      const store = tx.objectStore("terminos");
+      store.getAll().onsuccess = (event) => {
+        const datos = event.target.result;
+        if (datos.length > 0) {
+          datos.forEach(e => {
+            const clave = normalizarTexto(e.nombre);
+            glosario[clave] = e;
+          });
+          glosarioCargado = true;
+        } else {
+          cargarGlosario(true);
+        }
+      };
+    }
+
+    function cargarGlosario(guardarLocal = false) {
+      fetch(API_URL).then(res => res.json()).then(data => {
+        glosario = {};
+        for (let nombre in data) {
+          const clave = normalizarTexto(nombre);
+          glosario[clave] = data[nombre];
+        }
+        if (guardarLocal && db) guardarEnIndexedDB(glosario);
+      }).catch(err => console.error("Error al cargar glosario:", err));
+    }
+
+    function actualizarGlosario() {
+      if (navigator.onLine && db) {
+        cargarGlosario(true);
+        const ahora = new Date().toLocaleString();
+        localStorage.setItem("ultimaActualizacion", ahora);
+        document.getElementById("ultima-actualizacion").textContent = "Última actualización: " + ahora;
+        alert("✅ Glosario actualizado con éxito.");
+      } else {
+        alert("⚠️ No hay conexión o base de datos no disponible.");
+      }
+    }
 
     function buscar() {
       if (!glosarioCargado) return;
@@ -260,12 +307,12 @@
         resultado.innerText = "⚠️ Término no encontrado.";
         const sugerencias = Object.keys(glosario).filter(key => key.includes(termino));
         if (sugerencias.length > 0) {
-          resultado.innerHTML += `<br><br><em>¿Quisiste decir?:</em><br>${sugerencias.slice(0,3).map(s => resaltarCoincidencia(s, termino)).join(', ')}`;
+          resultado.innerHTML += `<br><br><em>¿Quisiste decir?:</em><br>${sugerencias.slice(0,3).map(s => s).join(', ')}`;
         }
         return;
       }
 
-      let html = `<div class="titulo-resultado">${resaltarCoincidencia(termino, termino)}</div>`;
+      let html = `<div class="titulo-resultado">${termino}</div>`;
       if ((entrada["Tipo de término"] || '').toLowerCase() === "abreviatura") {
         html += `<strong>Definición:</strong><br>${entrada["Definición"] || "-"}`;
       } else {
@@ -279,6 +326,35 @@
         }
       }
       resultado.innerHTML = html;
+    }
+
+    function limpiarBusqueda() {
+      document.getElementById("termino").value = "";
+      document.getElementById("resultado").innerText = "Resultado aquí...";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("modoClaro") === "1") {
+        document.body.classList.add("light-mode");
+      }
+      const ultima = localStorage.getItem("ultimaActualizacion") || "-";
+      document.getElementById("ultima-actualizacion").textContent = "Última actualización: " + ultima;
+      abrirBaseDatos();
+      document.getElementById("termino").addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(buscar, 300);
+      });
+      window.addEventListener("load", () => {
+        if (navigator.onLine && db) cargarGlosario(true);
+      });
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('serviceWorker.js')
+          .then(reg => console.log('✅ SW registrado:', reg.scope))
+          .catch(err => console.error('❌ Error SW:', err));
+      });
     }
   </script>
 </body>
