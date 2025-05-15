@@ -118,6 +118,13 @@
 
     .azul { color: #1877f2; }
     .rojo { color: #ff5c39; }
+      @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #resultado.mostrar {
+      animation: fadeIn 0.4s ease-out;
+    }
   </style>
 </head>
 <body>
@@ -139,6 +146,7 @@
       <button onclick="window.location.href='admin.html'">Admin</button>
     </div>
 
+    <div id="loading" style="display:none; color: #3ae374; margin-top:10px;">⏳ Buscando...</div>
     <div id="resultado">Resultado aquí...</div>
   </div>
 
@@ -162,17 +170,31 @@
     }
 
     function buscar() {
-      const termino = normalizarTexto(document.getElementById("termino").value.trim());
+      const terminoInput = document.getElementById("termino");
+      const termino = normalizarTexto(terminoInput.value.trim());
       const resultado = document.getElementById("resultado");
+      const loading = document.getElementById("loading");
       if (!termino) {
         resultado.innerText = "Por favor escribe un término.";
         return;
       }
+      loading.style.display = "block";
+      setTimeout(() => loading.style.display = "none", 500);
       const entrada = glosario[termino];
       if (!entrada) {
+        resultado.classList.remove("mostrar");
         resultado.innerText = "⚠️ Término no encontrado.";
+        const sugerencias = Object.keys(glosario).filter(key =>
+          key.includes(termino) && key !== termino
+        );
+        if (sugerencias.length > 0) {
+          resultado.innerHTML += `<br><br><em>¿Quisiste decir?:</em><br>${sugerencias.slice(0,3).join(', ')}`;
+        }
+        resultado.classList.add("mostrar");
         return;
       }
+      resultado.classList.remove("mostrar");
+      void resultado.offsetWidth;
       if ((entrada["Tipo de término"] || '').toLowerCase() === "abreviatura") {
         resultado.innerHTML = `<div class="titulo-resultado">${termino}</div><strong>Definición:</strong><br>${entrada["Definición"] || "-"}`;
       } else {
@@ -192,6 +214,9 @@
     }
 
     cargarGlosario();
+      document.getElementById("termino").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") buscar();
+    });
   </script>
 </body>
 </html>
