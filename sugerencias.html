@@ -154,7 +154,7 @@
       })
       .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
       .then(() => {
-        mensaje.innerHTML = '<div class="mensaje">💌 Gracias por tu sugerencia. <span class="corazon">❤️</span><br>Agradecemos tus sugerencias para mejorar la plataforma.</div>';
+        mensaje.innerHTML = '<div class="mensaje">💌 Tú sugerencia a sido enviada exitosamente. <span class="corazon">❤️</span><br>Agradecemos tus sugerencias para mejorar la plataforma.</div>';
         document.getElementById("sugerencia").value = "";
       })
       .catch(err => {
