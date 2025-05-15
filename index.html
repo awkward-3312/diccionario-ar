@@ -246,17 +246,66 @@
     }
 
     function enviarTermino() {
-      const tipo = document.getElementById("selectTipo").value;
-      let nuevoTermino = {
-        termino: '',
-        traduccion: '',
-        pronunciacion: '',
-        categoria: '',
-        definicion: '',
-        sinonimos: '',
-        tipo: tipo,
-        formaFarmaceutica: ''
-      };
+  const tipo = document.getElementById("selectTipo").value;
+  let nuevoTermino = {
+    termino: '',
+    traduccion: '',
+    pronunciacion: '',
+    categoria: '',
+    definicion: '',
+    sinonimos: '',
+    tipo: tipo,
+    formaFarmaceutica: ''
+  };
+
+  if (tipo === "abreviatura") {
+    nuevoTermino.termino = document.getElementById("inputTermino").value.trim();
+    nuevoTermino.definicion = document.getElementById("inputDefinicion").value.trim();
+  } else if (tipo === "término completo") {
+    nuevoTermino.termino = document.getElementById("inputTermino").value.trim();
+    nuevoTermino.traduccion = document.getElementById("inputTraduccion").value.trim();
+    nuevoTermino.pronunciacion = document.getElementById("inputPronunciacion").value.trim();
+    nuevoTermino.categoria = document.getElementById("inputCategoria").value.trim();
+    nuevoTermino.definicion = document.getElementById("inputDefinicion").value.trim();
+    nuevoTermino.sinonimos = document.getElementById("inputSinonimos").value.trim();
+  } else if (tipo === "forma farmacéutica") {
+    nuevoTermino.termino = document.getElementById("inputFormaFarmaceutica").value.trim();
+    nuevoTermino.traduccion = document.getElementById("inputTraduccion").value.trim();
+    nuevoTermino.categoria = document.getElementById("inputCategoria").value.trim();
+  } else {
+    alert("Por favor selecciona un tipo de término válido.");
+    return;
+  }
+
+  // Garantizar que todos los campos estén presentes
+  nuevoTermino = {
+    termino: nuevoTermino.termino || '',
+    traduccion: nuevoTermino.traduccion || '',
+    pronunciacion: nuevoTermino.pronunciacion || '',
+    categoria: nuevoTermino.categoria || '',
+    definicion: nuevoTermino.definicion || '',
+    sinonimos: nuevoTermino.sinonimos || '',
+    tipo: nuevoTermino.tipo || '',
+    formaFarmaceutica: nuevoTermino.formaFarmaceutica || ''
+  };
+
+  fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(nuevoTermino)
+  })
+  .then(res => res.json())
+  .then(data => {
+    mostrarPopup("✅ Término enviado exitosamente");
+    document.getElementById("formulario").reset();
+    cerrarFormulario();
+    cargarGlosario();
+  })
+  .catch(err => {
+    console.error("Error al enviar término:", err);
+    alert("Error al agregar término");
+  });
+};
 
       if (tipo === "abreviatura") {
         nuevoTermino.termino = document.getElementById("inputTermino").value.trim();
