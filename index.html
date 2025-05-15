@@ -75,7 +75,7 @@
       color: #111;
     }
 
-    input, button, select {
+    input, button {
       width: 100%;
       padding: 12px;
       margin-top: 10px;
@@ -208,12 +208,6 @@
     <h1><span class="azul">Diccionario</span><span class="rojo"> - AR</span></h1>
     <div class="busqueda">
       <input type="text" id="termino" placeholder="Escribe una palabra o abreviatura...">
-      <select id="filtroTipo">
-        <option value="">Todos los tipos</option>
-        <option value="abreviatura">Abreviatura</option>
-        <option value="término completo">Término completo</option>
-        <option value="forma farmacéutica">Forma farmacéutica</option>
-      </select>
     </div>
     <div class="botones-busqueda">
       <button onclick="buscar()">Buscar</button>
@@ -318,7 +312,6 @@
     function buscar() {
       if (!glosarioCargado) return;
       const terminoInput = document.getElementById("termino");
-      const filtro = document.getElementById("filtroTipo").value.toLowerCase();
       const termino = normalizarTexto(terminoInput.value.trim());
       const resultado = document.getElementById("resultado");
       const spinner = document.getElementById("spinner");
@@ -332,7 +325,7 @@
       setTimeout(() => spinner.style.display = "none", 500);
 
       const entrada = glosario[termino];
-      if (!entrada || (filtro && (entrada["Tipo de término"] || '').toLowerCase() !== filtro)) {
+      if (!entrada) {
         resultado.innerText = "⚠️ Término no encontrado.";
         const sugerencias = Object.keys(glosario).filter(key => key.includes(termino));
         if (sugerencias.length > 0) {
