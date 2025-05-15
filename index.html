@@ -24,6 +24,12 @@
       align-items: center;
       flex-direction: column;
       animation: parallax 60s linear infinite;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body.light-mode {
+      background: #f4f4f4;
+      color: #111;
     }
 
     @keyframes parallax {
@@ -41,6 +47,12 @@
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
       text-align: center;
       position: relative;
+      transition: background-color 0.3s;
+    }
+
+    body.light-mode .ventana {
+      background-color: #ffffff;
+      color: #111;
     }
 
     h1 {
@@ -51,7 +63,11 @@
       color: #fff;
     }
 
-    input, button {
+    body.light-mode h1 {
+      color: #111;
+    }
+
+    input, button, select {
       width: 100%;
       padding: 12px;
       margin-top: 10px;
@@ -64,6 +80,11 @@
     input {
       background: #2a2a2a;
       color: white;
+    }
+
+    body.light-mode input {
+      background: #ddd;
+      color: #111;
     }
 
     button {
@@ -89,6 +110,27 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.4);
       font-size: 15px;
       line-height: 1.6;
+    }
+
+    body.light-mode #resultado {
+      background-color: #e9e9e9;
+      color: #111;
+    }
+
+    .spinner {
+      border: 4px solid #333;
+      border-top: 4px solid #3ae374;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 10px auto;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .titulo-resultado {
@@ -120,17 +162,25 @@
     .rojo { color: #ff5c39; }
     .italic { font-style: italic; }
     .pronunciacion { color: #70d6ff; }
-</style>
+    mark { background: #fffd38; color: black; padding: 0 4px; border-radius: 3px; }
+  </style>
 </head>
 <body>
   <div class="ventana">
     <h1><span class="azul">Diccionario</span><span class="rojo"> - AR</span></h1>
     <div class="busqueda">
       <input type="text" id="termino" placeholder="Escribe una palabra o abreviatura...">
+      <select id="filtroTipo">
+        <option value="">Todos los tipos</option>
+        <option value="abreviatura">Abreviatura</option>
+        <option value="término completo">Término completo</option>
+        <option value="forma farmacéutica">Forma farmacéutica</option>
+      </select>
     </div>
     <div class="botones-busqueda">
       <button onclick="buscar()">Buscar</button>
       <button onclick="limpiarBusqueda()" style="background-color: #444;">Limpiar</button>
+      <button onclick="toggleModo()">🌓</button>
     </div>
 
     <div style="position: fixed; top: 10px; left: 20px; z-index: 1001;">
@@ -141,7 +191,7 @@
       <button onclick="window.location.href='admin.html'">Admin</button>
     </div>
 
-    <div id="loading" style="display:none; color: #3ae374; margin-top:10px;">⏳ Buscando...</div>
+    <div class="spinner" id="spinner"></div>
     <div id="resultado">Resultado aquí...</div>
   </div>
 
@@ -154,50 +204,32 @@
 
     function abrirBaseDatos() {
       const request = indexedDB.open("DiccionarioAR", 1);
-
-      request.onerror = function () {
-        console.error("❌ Error al abrir IndexedDB.");
-      };
-
-      request.onsuccess = function (event) {
+      request.onerror = () => console.error("❌ Error al abrir IndexedDB.");
+      request.onsuccess = (event) => {
         db = event.target.result;
-        console.log("✅ IndexedDB abierta.");
         cargarDesdeIndexedDB();
       };
-
-      request.onupgradeneeded = function (event) {
+      request.onupgradeneeded = (event) => {
         db = event.target.result;
-        const store = db.createObjectStore("terminos", { keyPath: "nombre" });
-        console.log("🗃️ IndexedDB creada.");
+        db.createObjectStore("terminos", { keyPath: "nombre" });
       };
     }
 
     function guardarEnIndexedDB(datos) {
       const tx = db.transaction("terminos", "readwrite");
       const store = tx.objectStore("terminos");
-      for (let nombre in datos) {
-        store.put({ nombre, ...datos[nombre] });
-      }
-      tx.oncomplete = () => {
-        console.log("📦 Términos guardados localmente en IndexedDB.");
-        glosarioCargado = true;
-      };
+      for (let nombre in datos) store.put({ nombre, ...datos[nombre] });
+      tx.oncomplete = () => { glosarioCargado = true; };
     }
 
     function cargarDesdeIndexedDB() {
       const tx = db.transaction("terminos", "readonly");
       const store = tx.objectStore("terminos");
-      const request = store.getAll();
-
-      request.onsuccess = function () {
-        const resultado = request.result;
-        if (resultado.length > 0) {
-          glosario = {};
-          resultado.forEach(entrada => {
-            glosario[entrada.nombre] = entrada;
-          });
+      store.getAll().onsuccess = (event) => {
+        const datos = event.target.result;
+        if (datos.length > 0) {
+          datos.forEach(e => glosario[e.nombre] = e);
           glosarioCargado = true;
-          console.log("📂 Glosario cargado desde IndexedDB.");
         } else {
           cargarGlosario(true);
         }
@@ -205,54 +237,51 @@
     }
 
     function cargarGlosario(guardarLocal = false) {
-      fetch(API_URL)
-        .then(res => res.json())
-        .then(data => {
-          glosario = data;
-          if (guardarLocal && db) guardarEnIndexedDB(data);
-        })
-        .catch(err => {
-          console.error("Error al cargar glosario:", err);
-        });
+      fetch(API_URL).then(res => res.json()).then(data => {
+        glosario = data;
+        if (guardarLocal && db) guardarEnIndexedDB(data);
+      }).catch(err => console.error("Error al cargar glosario:", err));
     }
 
     function normalizarTexto(texto) {
       return texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").toUpperCase();
     }
 
+    function resaltarCoincidencia(texto, termino) {
+      const reg = new RegExp(`(${termino})`, 'gi');
+      return texto.replace(reg, '<mark>$1</mark>');
+    }
+
     function buscar() {
-      if (!glosarioCargado) {
-        return;
-      }
+      if (!glosarioCargado) return;
       const terminoInput = document.getElementById("termino");
+      const filtro = document.getElementById("filtroTipo").value.toLowerCase();
       const termino = normalizarTexto(terminoInput.value.trim());
       const resultado = document.getElementById("resultado");
-      const loading = document.getElementById("loading");
+      const spinner = document.getElementById("spinner");
+
       if (!termino) {
         resultado.innerText = "Por favor escribe un término.";
         return;
       }
-      loading.style.display = "block";
-      setTimeout(() => loading.style.display = "none", 500);
+
+      spinner.style.display = "block";
+      setTimeout(() => spinner.style.display = "none", 500);
+
       const entrada = glosario[termino];
-      if (!entrada) {
-        resultado.classList.remove("mostrar");
+      if (!entrada || (filtro && (entrada["Tipo de término"] || '').toLowerCase() !== filtro)) {
         resultado.innerText = "⚠️ Término no encontrado.";
-        const sugerencias = Object.keys(glosario).filter(key =>
-          key.includes(termino) && key !== termino
-        );
+        const sugerencias = Object.keys(glosario).filter(key => key.includes(termino));
         if (sugerencias.length > 0) {
-          resultado.innerHTML += `<br><br><em>¿Quisiste decir?:</em><br>${sugerencias.slice(0,3).join(', ')}`;
+          resultado.innerHTML += `<br><br><em>¿Quisiste decir?:</em><br>${sugerencias.slice(0,3).map(s => resaltarCoincidencia(s, termino)).join(', ')}`;
         }
-        resultado.classList.add("mostrar");
         return;
       }
-      resultado.classList.remove("mostrar");
-      void resultado.offsetWidth;
+
       if ((entrada["Tipo de término"] || '').toLowerCase() === "abreviatura") {
-        resultado.innerHTML = `<div class="titulo-resultado">${termino}</div><strong>Definición:</strong><br>${entrada["Definición"] || "-"}`;
+        resultado.innerHTML = `<div class="titulo-resultado">${resaltarCoincidencia(termino, termino)}</div><strong>Definición:</strong><br>${entrada["Definición"] || "-"}`;
       } else {
-        resultado.innerHTML = `<div class="titulo-resultado">${termino}</div>
+        resultado.innerHTML = `<div class="titulo-resultado">${resaltarCoincidencia(termino, termino)}</div>
           <strong>Traducción:</strong> <span class="italic">${entrada["Traducción"] || "-"}</span><br>
           <strong>Pronunciación:</strong> <span class="pronunciacion">${entrada["Pronunciación"] || "-"}</span><br>
           <strong>Categoría:</strong> ${entrada["Categoría"] || "-"}<br>
@@ -267,28 +296,26 @@
       document.getElementById("resultado").innerText = "Resultado aquí...";
     }
 
+    function toggleModo() {
+      document.body.classList.toggle("light-mode");
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       abrirBaseDatos();
       document.getElementById("termino").addEventListener("input", () => {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(buscar, 300);
       });
-
       window.addEventListener("load", () => {
-        if (navigator.onLine && db) {
-          console.log("🌐 Conexión detectada. Actualizando glosario...");
-          cargarGlosario(true);
-        } else {
-          console.log("⚠️ Sin conexión. Usando datos guardados localmente.");
-        }
+        if (navigator.onLine && db) cargarGlosario(true);
       });
     });
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('serviceWorker.js')
-          .then(reg => console.log('✅ Service Worker registrado:', reg.scope))
-          .catch(err => console.error('❌ Error al registrar SW:', err));
+          .then(reg => console.log('✅ SW registrado:', reg.scope))
+          .catch(err => console.error('❌ Error SW:', err));
       });
     }
   </script>
