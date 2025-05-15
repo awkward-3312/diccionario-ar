@@ -149,6 +149,7 @@
     const API_URL = 'https://script.google.com/macros/s/AKfycbziHIpDwqhNISY4W5nVSlGnPZt_3MsBs9hPFhAeiQLo_9b7RYW97GIcwjVBw9tu4TJy/exec';
     let glosario = {};
     let db;
+    let glosarioCargado = false;
 
     function abrirBaseDatos() {
       const request = indexedDB.open("DiccionarioAR", 1);
@@ -176,7 +177,10 @@
       for (let nombre in datos) {
         store.put({ nombre, ...datos[nombre] });
       }
-      tx.oncomplete = () => console.log("📦 Términos guardados localmente en IndexedDB.");
+      tx.oncomplete = () => {
+        console.log("📦 Términos guardados localmente en IndexedDB.");
+        glosarioCargado = true;
+      };
     }
 
     function cargarDesdeIndexedDB() {
@@ -187,13 +191,13 @@
       request.onsuccess = function () {
         const resultado = request.result;
         if (resultado.length > 0) {
-          console.log("📂 Glosario cargado desde IndexedDB.");
           glosario = {};
           resultado.forEach(entrada => {
             glosario[entrada.nombre] = entrada;
           });
+          glosarioCargado = true;
+          console.log("📂 Glosario cargado desde IndexedDB.");
         } else {
-          console.log("⚠️ Base de datos vacía. Cargando desde Google Sheets...");
           cargarGlosario(true);
         }
       };
@@ -216,6 +220,10 @@
     }
 
     function buscar() {
+      if (!glosarioCargado) {
+        alert("⏳ Cargando datos, por favor espera un momento...");
+        return;
+      }
       const terminoInput = document.getElementById("termino");
       const termino = normalizarTexto(terminoInput.value.trim());
       const resultado = document.getElementById("resultado");
@@ -267,7 +275,7 @@
 
       window.addEventListener("load", () => {
         if (navigator.onLine && db) {
-          console.log("🌐 Conexión detectada. Actualizando glosario...");
+          console.log("🌐 Conexión detectada. Actualizando glosario desde Google Sheets...");
           cargarGlosario(true);
         } else {
           console.log("⚠️ Sin conexión. Usando datos guardados localmente.");
