@@ -8,7 +8,6 @@
       font-family: 'MiddleOfApril';
       src: url('Middle-of-April.ttf') format('truetype');
     }
-
     body {
       margin: 0;
       padding: 20px;
@@ -20,7 +19,6 @@
       background-attachment: fixed;
       color: #f1f1f1;
     }
-
     h1 {
       font-family: 'MiddleOfApril', cursive;
       font-size: 3rem;
@@ -28,7 +26,6 @@
       text-align: center;
       margin-bottom: 30px;
     }
-
     .contenedor, .login {
       max-width: 1000px;
       margin: 0 auto;
@@ -37,7 +34,6 @@
       border-radius: 20px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
-
     #buscador, .login input {
       margin-bottom: 20px;
       width: 100%;
@@ -48,29 +44,24 @@
       color: white;
       font-size: 16px;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 14px;
     }
-
     th, td {
       padding: 10px;
       border: 1px solid #444;
       text-align: left;
     }
-
     th {
       background-color: #007acc;
       color: white;
       cursor: pointer;
     }
-
     td {
       background-color: #2a2a2a;
     }
-
     button {
       background-color: #444;
       color: white;
@@ -81,29 +72,24 @@
       cursor: pointer;
       margin-top: 20px;
     }
-
     button:hover {
       background-color: #3ae374;
       color: black;
     }
-
     #adminPanel { display: none; }
   </style>
 </head>
 <body>
   <h1>Panel de Administración</h1>
-
   <div class="login" id="loginPanel">
-  <form onsubmit="verificarClave(); return false;">
-    <input type="password" id="clave" placeholder="Ingrese la contraseña">
-    <button type="submit">Ingresar</button>
-    <button type="button" onclick="window.location.href='index.html'" style="margin-top: 10px; background-color: #777;">Volver al inicio</button>
-  </form>
-</div>
-
+    <form onsubmit="verificarClave(); return false;">
+      <input type="password" id="clave" placeholder="Ingrese la contraseña">
+      <button type="submit">Ingresar</button>
+      <button type="button" onclick="window.location.href='index.html'" style="margin-top: 10px; background-color: #777;">Volver al inicio</button>
+    </form>
+  </div>
   <div class="contenedor" id="adminPanel">
     <input type="text" id="buscador" placeholder="Buscar por término..." onkeyup="filtrarTabla()">
-
     <table id="tablaTerminos">
       <thead>
         <tr>
@@ -114,7 +100,8 @@
           <th onclick="ordenarTabla(4)">Definición</th>
           <th onclick="ordenarTabla(5)">Sinónimos</th>
           <th onclick="ordenarTabla(6)">Tipo</th>
-          <th onclick="ordenarTabla(7)">Forma farmacéutica</th><th>Acciones</th>
+          <th onclick="ordenarTabla(7)">Forma farmacéutica</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -123,149 +110,145 @@
     </table>
     <button onclick="window.location.href='index.html'">Volver al inicio</button>
   </div>
-
   <script>
-  function verificarClave() {
-    const clave = document.getElementById("clave").value;
-    if (clave === "ARdic@2025") {
-      document.getElementById("loginPanel").style.display = "none";
-      document.getElementById("adminPanel").style.display = "block";
-      cargarDatos();
-    } else {
-      alert("Contraseña incorrecta");
-      document.getElementById("clave").value = "";
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzAzMs8JEWCQM0fzZobajM3iozSpTVnyS8mDtJuccWVmeu-rg4M3ed41fXWXEEBpz8/exec';
+
+    function verificarClave() {
+      const clave = document.getElementById("clave").value;
+      if (clave === "ARdic@2025") {
+        document.getElementById("loginPanel").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+        cargarDatos();
+      } else {
+        alert("Contraseña incorrecta");
+        document.getElementById("clave").value = "";
+      }
     }
-  }
 
-  function cargarDatos() {
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxpPfIquRCEF7G4ua2p1QXXs_hsv2LrdSU-fg07uCuzfnJ14sOmmtYdQWBJzCmZ_r4S/exec';
-    fetch(API_URL)
-      .then(res => res.json())
-      .then(data => {
-        const tbody = document.querySelector("#tablaTerminos tbody");
-        tbody.innerHTML = "";
+    function cargarDatos() {
+      fetch(API_URL)
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.querySelector("#tablaTerminos tbody");
+          tbody.innerHTML = "";
 
-        for (const termino in data) {
-          const fila = data[termino];
-          const tr = document.createElement("tr");
+          for (const termino in data) {
+            const fila = data[termino];
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${termino}</td>
+              <td>${fila["Traducción"] || ""}</td>
+              <td>${fila["Pronunciación"] || ""}</td>
+              <td>${fila["Categoría"] || ""}</td>
+              <td>${fila["Definición"] || ""}</td>
+              <td>${fila["Sinónimos"] || ""}</td>
+              <td>${fila["Tipo de término"] || ""}</td>
+              <td>${fila["Forma farmacéutica"] || ""}</td>`;
+            const editarBtn = `<button onclick=\"editarFila(this)\">✏️</button>`;
+            const eliminarBtn = `<button onclick=\"eliminarFila(this)\">🗑️</button>`;
+            const acciones = `<td>${editarBtn} ${eliminarBtn}</td>`;
+            tr.innerHTML += acciones;
+            tbody.appendChild(tr);
+          }
+        })
+        .catch(err => {
+          const tbody = document.querySelector("#tablaTerminos tbody");
+          tbody.innerHTML = `<tr><td colspan="9">❌ Error al cargar los términos.</td></tr>`;
+          console.error("Error cargando términos:", err);
+        });
+    }
 
-          tr.innerHTML = `
-            <td>${termino}</td>
-            <td>${fila["Traducción"] || ""}</td>
-            <td>${fila["Pronunciación"] || ""}</td>
-            <td>${fila["Categoría"] || ""}</td>
-            <td>${fila["Definición"] || ""}</td>
-            <td>${fila["Sinónimos"] || ""}</td>
-            <td>${fila["Tipo de término"] || ""}</td>
-            <td>${fila["Forma farmacéutica"] || ""}</td>`;
-
-          const editarBtn = `<button onclick=\"editarFila(this)\">✏️</button>`;
-          const eliminarBtn = `<button onclick=\"eliminarFila(this)\">🗑️</button>`;
-          const acciones = `<td>${editarBtn} ${eliminarBtn}</td>`;
-          tr.innerHTML += acciones;
-          tbody.appendChild(tr);
-        }
-      })
-      .catch(err => {
-        const tbody = document.querySelector("#tablaTerminos tbody");
-        tbody.innerHTML = `<tr><td colspan="9">❌ Error al cargar los términos.</td></tr>`;
-        console.error("Error cargando términos:", err);
+    function filtrarTabla() {
+      const input = document.getElementById("buscador").value.toLowerCase();
+      const filas = document.querySelectorAll("#tablaTerminos tbody tr");
+      filas.forEach(fila => {
+        const termino = fila.cells[0]?.innerText.toLowerCase() || "";
+        fila.style.display = termino.includes(input) ? "" : "none";
       });
-  }
-
-  function filtrarTabla() {
-    const input = document.getElementById("buscador").value.toLowerCase();
-    const filas = document.querySelectorAll("#tablaTerminos tbody tr");
-    filas.forEach(fila => {
-      const termino = fila.cells[0]?.innerText.toLowerCase() || "";
-      fila.style.display = termino.includes(input) ? "" : "none";
-    });
-  }
-
-  function ordenarTabla(columna) {
-    const tabla = document.getElementById("tablaTerminos");
-    let filas = Array.from(tabla.rows).slice(1);
-    let ordenAsc = tabla.getAttribute("data-orden") !== "asc";
-    tabla.setAttribute("data-orden", ordenAsc ? "asc" : "desc");
-
-    filas.sort((a, b) => {
-      const textoA = a.cells[columna].innerText.toLowerCase();
-      const textoB = b.cells[columna].innerText.toLowerCase();
-      return ordenAsc ? textoA.localeCompare(textoB) : textoB.localeCompare(textoA);
-    });
-
-    const tbody = tabla.querySelector("tbody");
-    tbody.innerHTML = "";
-    filas.forEach(f => tbody.appendChild(f));
-  }
-
-  function editarFila(boton) {
-    const fila = boton.parentNode.parentNode;
-    const celdas = fila.querySelectorAll("td");
-    for (let i = 0; i < celdas.length - 1; i++) {
-      const texto = celdas[i].innerText;
-      celdas[i].innerHTML = `<input value="${texto}" style='width: 100%; background-color: #2a2a2a; color: white; border: none; padding: 4px;'>`;
     }
-    boton.textContent = '💾';
-    boton.onclick = () => guardarEdicion(fila);
-  }
 
-  function guardarEdicion(fila) {
-    const inputs = fila.querySelectorAll("input");
-    const valores = Array.from(inputs).map(input => input.value.trim());
-    const terminoClave = valores[0];
+    function ordenarTabla(columna) {
+      const tabla = document.getElementById("tablaTerminos");
+      let filas = Array.from(tabla.rows).slice(1);
+      let ordenAsc = tabla.getAttribute("data-orden") !== "asc";
+      tabla.setAttribute("data-orden", ordenAsc ? "asc" : "desc");
 
-    valores.forEach((valor, i) => {
-      fila.cells[i].innerText = valor;
-    });
+      filas.sort((a, b) => {
+        const textoA = a.cells[columna].innerText.toLowerCase();
+        const textoB = b.cells[columna].innerText.toLowerCase();
+        return ordenAsc ? textoA.localeCompare(textoB) : textoB.localeCompare(textoA);
+      });
 
-    fila.querySelector("button").textContent = '✏️';
-    fila.querySelector("button").onclick = () => editarFila(fila.querySelector("button"));
+      const tbody = tabla.querySelector("tbody");
+      tbody.innerHTML = "";
+      filas.forEach(f => tbody.appendChild(f));
+    }
 
-    fetch('https://script.google.com/macros/s/AKfycbxpPfIquRCEF7G4ua2p1QXXs_hsv2LrdSU-fg07uCuzfnJ14sOmmtYdQWBJzCmZ_r4S/exec', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        actualizar: true,
-        termino: terminoClave,
-        traduccion: valores[1],
-        pronunciacion: valores[2],
-        categoria: valores[3],
-        definicion: valores[4],
-        sinonimos: valores[5],
-        tipo: valores[6],
-        formaFarmaceutica: valores[7]
+    function editarFila(boton) {
+      const fila = boton.parentNode.parentNode;
+      const celdas = fila.querySelectorAll("td");
+      for (let i = 0; i < celdas.length - 1; i++) {
+        const texto = celdas[i].innerText;
+        celdas[i].innerHTML = `<input value="${texto}" style='width: 100%; background-color: #2a2a2a; color: white; border: none; padding: 4px;'>`;
+      }
+      boton.textContent = '💾';
+      boton.onclick = () => guardarEdicion(fila);
+    }
+
+    function guardarEdicion(fila) {
+      const inputs = fila.querySelectorAll("input");
+      const valores = Array.from(inputs).map(input => input.value.trim());
+      const terminoClave = valores[0];
+
+      valores.forEach((valor, i) => {
+        fila.cells[i].innerText = valor;
+      });
+
+      fila.querySelector("button").textContent = '✏️';
+      fila.querySelector("button").onclick = () => editarFila(fila.querySelector("button"));
+
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actualizar: true,
+          termino: terminoClave,
+          traduccion: valores[1],
+          pronunciacion: valores[2],
+          categoria: valores[3],
+          definicion: valores[4],
+          sinonimos: valores[5],
+          tipo: valores[6],
+          formaFarmaceutica: valores[7]
+        })
       })
-    })
-    .then(res => res.text())
-    .then(msg => {
-      console.log('✅ Actualizado en Google Sheets:', msg);
-      if (msg.includes('✅ Término actualizado')) {
+      .then(res => res.text())
+      .then(msg => {
+        console.log('✅ Actualizado en Google Sheets:', msg);
         const popup = document.getElementById("popupMsg");
         popup.textContent = msg;
         popup.style.display = "block";
         setTimeout(() => popup.style.display = "none", 2000);
-      }
-    })
-    .catch(err => console.error('❌ Error al actualizar en Sheets:', err));
-  }
-
-  function eliminarFila(boton) {
-    const fila = boton.parentNode.parentNode;
-    const termino = fila.cells[0]?.innerText;
-    if (confirm("¿Seguro que deseas eliminar esta fila?")) {
-      fila.remove();
-      fetch('https://script.google.com/macros/s/AKfycbyyBhsgzw1ZFib9G4GFwMUHhsPoKY84Hhyn2bx77EgxnmDXt2vBC_LXbtbQP3f0CogX/exec', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eliminar: true, termino })
       })
-      .then(res => res.text())
-      .then(msg => console.log('🗑️ Eliminado en Google Sheets:', msg))
-      .catch(err => console.error('❌ Error al eliminar en Sheets:', err));
+      .catch(err => console.error('❌ Error al actualizar en Sheets:', err));
     }
-  }
-</script>
-<div id="popupMsg" style="display:none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #3ae374; color: black; padding: 12px 24px; border-radius: 10px; font-weight: bold; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">✅ Término actualizado</div>
+
+    function eliminarFila(boton) {
+      const fila = boton.parentNode.parentNode;
+      const termino = fila.cells[0]?.innerText;
+      if (confirm("¿Seguro que deseas eliminar esta fila?")) {
+        fila.remove();
+        fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ eliminar: true, termino })
+        })
+        .then(res => res.text())
+        .then(msg => console.log('🗑️ Eliminado en Google Sheets:', msg))
+        .catch(err => console.error('❌ Error al eliminar en Sheets:', err));
+      }
+    }
+  </script>
+  <div id="popupMsg" style="display:none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #3ae374; color: black; padding: 12px 24px; border-radius: 10px; font-weight: bold; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">✅ Término actualizado</div>
 </body>
 </html>
