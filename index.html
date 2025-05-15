@@ -138,7 +138,7 @@
     <div id="resultado">Resultado aquí...</div>
 
     <div id="formulario" style="display: none; flex-direction: column; background: #1e1e1e; padding: 20px; border-radius: 10px; margin-top: 20px; width: 100%; max-width: 700px;">
-      <h3 style="color: white;">Nuevo Término</h3>
+      <h3 style="font-family: 'MiddleOfApril', cursive; color: #3ae374; font-weight: bold; font-size: 2rem; text-transform: uppercase; text-align: center; margin-top: 0;">Nuevo Término</h3>
       <input type="text" id="inputTermino" placeholder="Término">
       <input type="text" id="inputTraduccion" placeholder="Traducción">
       <input type="text" id="inputPronunciacion" placeholder="Pronunciación">
@@ -152,16 +152,15 @@
         <option value="término completo">Término completo</option>
         <option value="forma farmacéutica">Forma farmacéutica</option>
       </select>
-      <div style="display: flex; justify-content: space-between; margin-top: 10px;">
-        <button onclick="enviarTermino()">Guardar</button>
-        <button onclick="cerrarFormulario()" style="background-color: #999;">Cerrar</button>
+      <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+        <button onclick="enviarTermino()" style="width: 120px;">Guardar</button>
+        <button onclick="cerrarFormulario()" style="background-color: #999; width: 120px;">Cerrar</button>
       </div>
     </div>
   </div>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbziHIpDwqhNISY4W5nVSlGnPZt_3MsBs9hPFhAeiQLo_9b7RYW97GIcwjVBw9tu4TJy/exec';
-
     let glosario = {};
 
     function normalizarTexto(texto) {
@@ -182,18 +181,15 @@
     function buscar() {
       const termino = normalizarTexto(document.getElementById("termino").value.trim());
       const resultado = document.getElementById("resultado");
-
       if (!termino) {
         resultado.innerText = "Por favor escribe un término.";
         return;
       }
-
       const entrada = glosario[termino];
       if (!entrada) {
         resultado.innerText = "Término no encontrado.";
         return;
       }
-
       if ((entrada["Tipo de término"] || '').toLowerCase() === "abreviatura") {
         resultado.innerHTML = `<div class="titulo-resultado">${termino}</div><strong>Definición:</strong><br>${entrada["Definición"] || "-"}`;
       } else {
