@@ -2,13 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Revisar Sugerencias - Diccionario AR</title>
-<link rel="icon" type="image/png" href="favicon-ar.png">
-<link rel="shortcut icon" href="favicon-ar.ico" type="image/x-icon">
+  <link rel="icon" type="image/png" href="favicon-ar.png">
+  <link rel="shortcut icon" href="favicon-ar.ico" type="image/x-icon">
   <style>
     @font-face {
       font-family: 'MiddleOfApril';
       src: url('Middle-of-April.ttf') format('truetype');
+    }
+    * {
+      box-sizing: border-box;
     }
     body {
       margin: 0;
@@ -26,7 +30,6 @@
         linear-gradient(to bottom, rgba(255,255,255,0.85), rgba(255,255,255,0.95)),
         url('fondo-claro.png') no-repeat center center fixed;
       background-size: cover;
-      background-attachment: fixed;
       color: #111;
     }
     h1 {
@@ -92,6 +95,33 @@
     body.light-mode button {
       color: #111;
     }
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead {
+        display: none;
+      }
+      tr {
+        margin-bottom: 15px;
+        border-bottom: 2px solid #444;
+      }
+      td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+      }
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        width: 45%;
+        padding-left: 10px;
+        font-weight: bold;
+        text-align: left;
+        color: #3ae374;
+      }
+    }
   </style>
 </head>
 <body>
@@ -132,21 +162,15 @@
 
         for (const clave in data) {
           const fila = data[clave];
-          console.log('📝 Fila completa:', fila);
-          console.log('🔑 Claves disponibles:', Object.keys(fila));
-
           const fecha = fila.Timestamp || '-';
           const nombre = fila.Nombre || 'Anónimo';
-
-          const mensaje =
-            fila.Mensaje ||
-            fila.Sugerencia ||
-            fila[' mensaje'] ||
-            fila['Mensaje '] ||
-            '-';
+          const mensaje = fila.Mensaje || fila.Sugerencia || fila[' mensaje'] || fila['Mensaje '] || '-';
 
           const tr = document.createElement('tr');
-          tr.innerHTML = `<td>${fecha}</td><td>${nombre}</td><td>${mensaje}</td>`;
+          tr.innerHTML = `
+            <td data-label="Fecha">${fecha}</td>
+            <td data-label="Nombre">${nombre}</td>
+            <td data-label="Mensaje">${mensaje}</td>`;
           tbody.appendChild(tr);
         }
       })
