@@ -2,13 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel Admin - Diccionario AR</title>
-<link rel="icon" type="image/png" href="favicon-ar.png">
-<link rel="shortcut icon" href="favicon-ar.ico" type="image/x-icon">
+  <link rel="icon" type="image/png" href="favicon-ar.png">
+  <link rel="shortcut icon" href="favicon-ar.ico" type="image/x-icon">
   <style>
     @font-face {
       font-family: 'MiddleOfApril';
       src: url('Middle-of-April.ttf') format('truetype');
+    }
+    * {
+      box-sizing: border-box;
     }
     body {
       margin: 0;
@@ -135,6 +139,33 @@
     body.light-mode .btn-fijo-sugerencias:hover {
       background-color: #f06292;
       color: black;
+    }
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead tr {
+        display: none;
+      }
+      tr {
+        margin-bottom: 15px;
+        border-bottom: 2px solid #444;
+      }
+      td {
+        padding: 10px;
+        text-align: right;
+        position: relative;
+      }
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        width: 45%;
+        padding-left: 10px;
+        font-weight: bold;
+        text-align: left;
+        color: #3ae374;
+      }
     }
   </style>
 </head>
