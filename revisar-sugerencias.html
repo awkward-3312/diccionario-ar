@@ -105,7 +105,7 @@
   <div class="contenedor">
     <table id="tablaSugerencias">
       <thead>
-        <tr><th>Fecha</th><th>Nombre</th><th>Sugerencia</th></tr>
+        <tr><th>Fecha</th><th>Nombre</th><th>Mensaje</th></tr>
       </thead>
       <tbody>
         <tr><td colspan="3" style="text-align:center;">Cargando sugerencias...</td></tr>
@@ -130,9 +130,10 @@
 
         for (const clave in data) {
           const fila = data[clave];
+          console.log('📝 Fila:', fila); // Depuración
           const fecha = fila.Timestamp || '-';
           const nombre = fila.Nombre || 'Anónimo';
-          const mensaje = fila.Sugerencia || '-';
+          const mensaje = fila.Mensaje || '-';
 
           const tr = document.createElement('tr');
           tr.innerHTML = `<td>${fecha}</td><td>${nombre}</td><td>${mensaje}</td>`;
