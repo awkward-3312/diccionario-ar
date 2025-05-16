@@ -2,13 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sugerencias - Diccionario AR</title>
- <link rel="icon" type="image/png" href="favicon-ar.png">
-<link rel="shortcut icon" href="favicon-ar.ico" type="image/x-icon">
+  <link rel="icon" type="image/png" href="favicon-ar.png">
+  <link rel="shortcut icon" href="favicon-ar.ico" type="image/x-icon">
   <style>
     @font-face {
       font-family: 'MiddleOfApril';
       src: url('Middle-of-April.ttf') format('truetype');
+    }
+    * {
+      box-sizing: border-box;
     }
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -123,6 +127,23 @@
       background-color: #ffd2d2;
       color: #111;
     }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+      .ventana {
+        padding: 20px;
+        border-radius: 15px;
+      }
+      textarea {
+        font-size: 14px;
+        padding: 8px;
+      }
+      button {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -152,11 +173,11 @@
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `sugerencia=${encodeURIComponent(texto)}`
+        body: `sugerencia=${encodeURIComponent(texto)`
       })
       .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
       .then(() => {
-        mensaje.innerHTML = '<div class="mensaje">💌 Tú sugerencia a sido enviada exitosamente. <span class="corazon">❤️</span><br>Agradecemos tus sugerencias para mejorar la plataforma.</div>';
+        mensaje.innerHTML = '<div class="mensaje">💌 Tu sugerencia ha sido enviada exitosamente. <span class="corazon">❤️</span><br>Agradecemos tus sugerencias para mejorar la plataforma.</div>';
         document.getElementById("sugerencia").value = "";
       })
       .catch(err => {
