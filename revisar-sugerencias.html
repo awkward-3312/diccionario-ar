@@ -95,7 +95,7 @@
 <body>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      if (localStorage.getItem("modoClaro") === "1") {
+      if (localStorage.getItem("modo") === "claro") {
         document.body.classList.add("light-mode");
       }
     });
@@ -105,10 +105,10 @@
   <div class="contenedor">
     <table id="tablaSugerencias">
       <thead>
-        <tr><th>Fecha</th><th>Sugerencia</th></tr>
+        <tr><th>Fecha</th><th>Nombre</th><th>Sugerencia</th></tr>
       </thead>
       <tbody>
-        <tr><td colspan="2" style="text-align:center;">Cargando sugerencias...</td></tr>
+        <tr><td colspan="3" style="text-align:center;">Cargando sugerencias...</td></tr>
       </tbody>
     </table>
     <button onclick="window.location.href='admin.html'">Volver al panel</button>
@@ -123,19 +123,25 @@
         const tbody = document.querySelector('#tablaSugerencias tbody');
         tbody.innerHTML = '';
 
-        if (data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;">No hay sugerencias disponibles.</td></tr>';
+        if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+          tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No hay sugerencias disponibles.</td></tr>';
           return;
         }
 
-        data.forEach(s => {
+        for (const clave in data) {
+          const entrada = data[clave];
+          const fecha = entrada.Timestamp || '-';
+          const nombre = entrada.Nombre || 'Anónimo';
+          const mensaje = entrada.Sugerencia || entrada.Mensaje || '-';
+
           const tr = document.createElement('tr');
-          tr.innerHTML = `<td>${s.fecha}</td><td>${s.sugerencia}</td>`;
+          tr.innerHTML = `<td>${fecha}</td><td>${nombre}</td><td>${mensaje}</td>`;
           tbody.appendChild(tr);
-        });
+        }
       })
       .catch(err => {
-        document.querySelector('#tablaSugerencias tbody').innerHTML = '<tr><td colspan="2">❌ Error al cargar sugerencias.</td></tr>';
+        document.querySelector('#tablaSugerencias tbody').innerHTML =
+          '<tr><td colspan="3" style="text-align:center;">❌ Error al cargar sugerencias.</td></tr>';
         console.error('Error al obtener sugerencias:', err);
       });
   </script>
