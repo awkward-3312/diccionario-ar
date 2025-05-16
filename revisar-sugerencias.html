@@ -92,7 +92,15 @@
     }
   </style>
 </head>
-<body onload="if (localStorage.getItem('modoClaro') === '1') document.body.classList.add('light-mode');">
+<body>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("modoClaro") === "1") {
+        document.body.classList.add("light-mode");
+      }
+    });
+  </script>
+
   <h1><span class="azul">Sugerencias</span> <span class="rojo">Recibidas</span></h1>
   <div class="contenedor">
     <table id="tablaSugerencias">
