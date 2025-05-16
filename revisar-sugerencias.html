@@ -74,7 +74,7 @@
       background-color: #eaeaea;
     }
     button {
-      background-color: #444;
+      background-color: #007acc;
       color: white;
       padding: 10px 20px;
       border: none;
@@ -82,10 +82,10 @@
       font-weight: bold;
       cursor: pointer;
       margin-top: 20px;
+      transition: background 0.3s;
     }
     button:hover {
-      background-color: #3ae374;
-      color: black;
+      background-color: #005f99;
     }
     body.light-mode button {
       color: #111;
@@ -105,7 +105,7 @@
   <div class="contenedor">
     <table id="tablaSugerencias">
       <thead>
-        <tr><th>Fecha</th><th>Nombre</th><th>Sugerencia</th></tr>
+        <tr><th>Fecha</th><th>Nombre</th><th>Mensaje</th></tr>
       </thead>
       <tbody>
         <tr><td colspan="3" style="text-align:center;">Cargando sugerencias...</td></tr>
@@ -129,10 +129,10 @@
         }
 
         for (const clave in data) {
-          const entrada = data[clave];
-          const fecha = entrada.Timestamp || '-';
-          const nombre = entrada.Nombre || 'Anónimo';
-          const mensaje = entrada.Mensaje || '-';
+          const fila = data[clave];
+          const fecha = fila.Timestamp || '-';
+          const nombre = fila.Nombre || 'Anónimo';
+          const mensaje = fila.Mensaje || '-';
 
           const tr = document.createElement('tr');
           tr.innerHTML = `<td>${fecha}</td><td>${nombre}</td><td>${mensaje}</td>`;
