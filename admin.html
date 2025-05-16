@@ -105,7 +105,10 @@
   <h1><span class="azul">PANEL</span> <span class="rojo">ADMIN</span></h1>
   <div class="login" id="loginPanel">
     <form onsubmit="verificarClave(); return false;">
-      <input type="password" id="clave" placeholder="Ingrese la contraseña">
+      <div style="position: relative;">
+        <input type="password" id="clave" placeholder="Ingrese la contraseña">
+        <button type="button" onclick="toggleClave()" style="position: absolute; right: 10px; top: 8px; background: none; border: none; color: #3ae374; cursor: pointer; font-size: 18px;">👁️</button>
+      </div>
       <button type="submit">Ingresar</button>
       <button type="button" onclick="window.location.href='index.html'" style="margin-top: 10px; background-color: #777;">Volver al inicio</button>
     </form>
@@ -133,8 +136,14 @@
     <button onclick="window.location.href='index.html'">Volver al inicio</button>
   </div>
   <button class="btn-fijo-sugerencias" onclick="window.location.href='revisar-sugerencias.html'">📬 Ver sugerencias</button>
+
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzAzMs8JEWCQM0fzZobajM3iozSpTVnyS8mDtJuccWVmeu-rg4M3ed41fXWXEEBpz8/exec';
+
+    function toggleClave() {
+      const input = document.getElementById("clave");
+      input.type = input.type === "password" ? "text" : "password";
+    }
 
     function verificarClave() {
       const clave = document.getElementById("clave").value;
@@ -154,7 +163,6 @@
         .then(data => {
           const tbody = document.querySelector("#tablaTerminos tbody");
           tbody.innerHTML = "";
-
           for (const termino in data) {
             const fila = data[termino];
             const tr = document.createElement("tr");
@@ -169,14 +177,12 @@
               <td>${fila["Forma farmacéutica"] || ""}</td>`;
             const editarBtn = `<button onclick=\"editarFila(this)\">✏️</button>`;
             const eliminarBtn = `<button onclick=\"eliminarFila(this)\">🗑️</button>`;
-            const acciones = `<td>${editarBtn} ${eliminarBtn}</td>`;
-            tr.innerHTML += acciones;
+            tr.innerHTML += `<td>${editarBtn} ${eliminarBtn}</td>`;
             tbody.appendChild(tr);
           }
         })
         .catch(err => {
-          const tbody = document.querySelector("#tablaTerminos tbody");
-          tbody.innerHTML = `<tr><td colspan="9">❌ Error al cargar los términos.</td></tr>`;
+          document.querySelector("#tablaTerminos tbody").innerHTML = `<tr><td colspan='9'>❌ Error al cargar los términos.</td></tr>`;
           console.error("Error cargando términos:", err);
         });
     }
@@ -247,7 +253,6 @@
       })
       .then(res => res.text())
       .then(msg => {
-        console.log('✅ Actualizado en Google Sheets:', msg);
         const popup = document.getElementById("popupMsg");
         popup.textContent = msg;
         popup.style.display = "block";
