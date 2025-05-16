@@ -130,10 +130,18 @@
 
         for (const clave in data) {
           const fila = data[clave];
-          console.log('📝 Fila:', fila); // Depuración
+          console.log('📝 Fila completa:', fila);
+          console.log('🔑 Claves disponibles:', Object.keys(fila));
+
           const fecha = fila.Timestamp || '-';
           const nombre = fila.Nombre || 'Anónimo';
-          const mensaje = fila.Mensaje || '-';
+
+          const mensaje =
+            fila.Mensaje ||
+            fila.Sugerencia ||
+            fila[' mensaje'] ||
+            fila['Mensaje '] ||
+            '-';
 
           const tr = document.createElement('tr');
           tr.innerHTML = `<td>${fecha}</td><td>${nombre}</td><td>${mensaje}</td>`;
