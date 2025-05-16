@@ -2,13 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Diccionario - AR</title>
-<link rel="icon" type="image/png" href="favicon-ar.png">
-<link rel="shortcut icon" href="favicon-ar.ico" type="image/x-icon">
+  <link rel="icon" type="image/png" href="favicon-ar.png">
+  <link rel="shortcut icon" href="favicon-ar.ico" type="image/x-icon">
   <style>
     @font-face {
       font-family: 'MiddleOfApril';
       src: url('Middle-of-April.ttf') format('truetype');
+    }
+    * {
+      box-sizing: border-box;
     }
     html, body {
       margin: 0;
@@ -44,8 +48,7 @@
       100% { background-position: center center; }
     }
     .ventana {
-      background:
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.95));
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.95));
       border-radius: 30px;
       padding: 40px;
       width: 90%;
@@ -58,35 +61,6 @@
     body.light-mode .ventana {
       background: rgba(255, 255, 255, 0.95);
       color: #111;
-    }
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      display: none;
-    }
-    .modal-contenido {
-      background: white;
-      padding: 30px;
-      border-radius: 20px;
-      text-align: center;
-      max-width: 300px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.5);
-    }
-    .modal-contenido p {
-      margin-bottom: 20px;
-    }
-    .modal-contenido button {
-      background-color: #3ae374;
-      color: black;
-      font-weight: bold;
     }
     h1 {
       font-family: 'MiddleOfApril', cursive;
@@ -105,7 +79,6 @@
       font-size: 16px;
       border: none;
       border-radius: 8px;
-      box-sizing: border-box;
     }
     input {
       background: #2a2a2a;
@@ -155,42 +128,16 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    .titulo-resultado {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 8px;
-      color: #3ae374;
-    }
-    .sinonimos span {
-      background-color: #333;
-      padding: 4px 8px;
-      margin: 2px;
-      border-radius: 6px;
-      display: inline-block;
-      color: white;
-    }
-    body.light-mode .sinonimos span {
-      background-color: #bbb;
-      color: #000;
-    }
-    .pronunciacion {
-      color: #70d6ff;
-    }
-    body.light-mode .pronunciacion {
-      color: #003366;
-    }
     .botones-busqueda {
       display: flex;
       justify-content: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
     .botones-busqueda button {
-      width: 120px;
+      width: 100%;
+      max-width: 120px;
     }
-    .azul { color: #1877f2; }
-    .rojo { color: #ff5c39; }
-    .italic { font-style: italic; }
-    mark { background: #fffd38; color: black; padding: 0 4px; border-radius: 3px; }
     #toggle-modo {
       position: fixed;
       bottom: 20px;
@@ -224,6 +171,27 @@
     }
     body.light-mode #ultima-actualizacion {
       color: #444;
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+      .ventana {
+        padding: 20px;
+        border-radius: 15px;
+      }
+      input, button {
+        font-size: 14px;
+        padding: 10px;
+      }
+      #toggle-modo {
+        width: 50px;
+        height: 26px;
+      }
+      #toggle-modo::before {
+        width: 22px;
+        height: 22px;
+      }
     }
   </style>
 </head>
