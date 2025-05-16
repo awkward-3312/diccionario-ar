@@ -11,9 +11,7 @@
       font-family: 'MiddleOfApril';
       src: url('Middle-of-April.ttf') format('truetype');
     }
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       padding: 20px;
@@ -97,6 +95,7 @@
       color: #111;
     }
     #adminPanel { display: none; }
+    #btnSugerencias { display: none; }
     .azul { color: #1877f2; }
     .rojo { color: #ff5c39; }
     tr:nth-child(even) td { background-color: #242424; }
@@ -202,7 +201,7 @@
     <div id="paginacion" style="text-align:center; margin-top:20px;"></div>
     <button onclick="window.location.href='index.html'">Volver al inicio</button>
   </div>
-  <button class="btn-fijo-sugerencias" onclick="window.location.href='revisar-sugerencias.html'">📬 Ver sugerencias</button>
+  <button id="btnSugerencias" class="btn-fijo-sugerencias" onclick="window.location.href='revisar-sugerencias.html'">📬 Ver sugerencias</button>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzAzMs8JEWCQM0fzZobajM3iozSpTVnyS8mDtJuccWVmeu-rg4M3ed41fXWXEEBpz8/exec';
@@ -228,6 +227,7 @@
       if (clave === "ARdic@2025") {
         document.getElementById("loginPanel").style.display = "none";
         document.getElementById("adminPanel").style.display = "block";
+        document.getElementById("btnSugerencias").style.display = "block";
         cargarDatos();
       } else {
         alert("Contraseña incorrecta");
@@ -290,27 +290,27 @@
       };
       paginacion.appendChild(btnAnterior);
 
-      for (let i = 1; i <= totalPaginas; i++) {
-        if (i <= 3 || i === totalPaginas || Math.abs(i - paginaActual) <= 1) {
-          const btn = document.createElement("button");
-          btn.textContent = i;
-          btn.style.margin = "0 3px";
-          btn.onclick = () => {
-            paginaActual = i;
-            mostrarPagina(paginaActual);
-          };
-          if (i === paginaActual) {
-            btn.style.backgroundColor = "#3ae374";
-            btn.style.color = "black";
-          }
-          paginacion.appendChild(btn);
-        } else if (i === 4 && paginaActual > 5 || i === totalPaginas - 1 && paginaActual < totalPaginas - 3) {
-          const dots = document.createElement("span");
-          dots.textContent = "...";
-          dots.style.margin = "0 5px";
-          paginacion.appendChild(dots);
-          i = i < paginaActual ? paginaActual - 2 : totalPaginas - 1;
+      let inicio = Math.max(1, paginaActual - 1);
+      let fin = Math.min(totalPaginas, paginaActual + 1);
+      if (paginaActual >= totalPaginas - 1) {
+        inicio = totalPaginas - 2;
+        fin = totalPaginas;
+      }
+      if (inicio < 1) inicio = 1;
+
+      for (let i = inicio; i <= fin; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.style.margin = "0 3px";
+        btn.onclick = () => {
+          paginaActual = i;
+          mostrarPagina(paginaActual);
+        };
+        if (i === paginaActual) {
+          btn.style.backgroundColor = "#3ae374";
+          btn.style.color = "black";
         }
+        paginacion.appendChild(btn);
       }
 
       const btnSiguiente = document.createElement("button");
