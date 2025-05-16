@@ -121,12 +121,17 @@
         <tr><td colspan="9" style="text-align:center;">Cargando términos...</td></tr>
       </tbody>
     </table>
+    <div id="paginacion" style="text-align:center; margin-top:20px;"></div>
     <button onclick="window.location.href='index.html'">Volver al inicio</button>
   </div>
   <button class="btn-fijo-sugerencias" onclick="window.location.href='revisar-sugerencias.html'">📬 Ver sugerencias</button>
 
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbzAzMs8JEWCQM0fzZobajM3iozSpTVnyS8mDtJuccWVmeu-rg4M3ed41fXWXEEBpz8/exec';
+    let todasLasFilas = [];
+    let paginaActual = 1;
+    const filasPorPagina = 10;
+    const tbody = document.querySelector("#tablaTerminos tbody");
 
     function toggleMostrar() {
       const input = document.getElementById("clave");
@@ -196,8 +201,7 @@
       fetch(API_URL)
         .then(res => res.json())
         .then(data => {
-          const tbody = document.querySelector("#tablaTerminos tbody");
-          tbody.innerHTML = "";
+          todasLasFilas = [];
           for (const termino in data) {
             const fila = data[termino];
             const tr = document.createElement("tr");
@@ -213,106 +217,54 @@
             const editarBtn = `<button onclick=\"editarFila(this)\">✏️</button>`;
             const eliminarBtn = `<button onclick=\"eliminarFila(this)\">🗑️</button>`;
             tr.innerHTML += `<td>${editarBtn} ${eliminarBtn}</td>`;
-            tbody.appendChild(tr);
+            todasLasFilas.push(tr);
           }
+          mostrarPagina(paginaActual);
         })
         .catch(err => {
-          document.querySelector("#tablaTerminos tbody").innerHTML = `<tr><td colspan='9'>❌ Error al cargar los términos.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan='9'>❌ Error al cargar los términos.</td></tr>`;
           console.error("Error cargando términos:", err);
         });
     }
 
-    function filtrarTabla() {
-      const input = document.getElementById("buscador").value.toLowerCase();
-      const filas = document.querySelectorAll("#tablaTerminos tbody tr");
-      filas.forEach(fila => {
-        const termino = fila.cells[0]?.innerText.toLowerCase() || "";
-        fila.style.display = termino.includes(input) ? "" : "none";
-      });
-    }
-
-    function ordenarTabla(columna) {
-      const tabla = document.getElementById("tablaTerminos");
-      let filas = Array.from(tabla.rows).slice(1);
-      let ordenAsc = tabla.getAttribute("data-orden") !== "asc";
-      tabla.setAttribute("data-orden", ordenAsc ? "asc" : "desc");
-
-      filas.sort((a, b) => {
-        const textoA = a.cells[columna].innerText.toLowerCase();
-        const textoB = b.cells[columna].innerText.toLowerCase();
-        return ordenAsc ? textoA.localeCompare(textoB) : textoB.localeCompare(textoA);
-      });
-
-      const tbody = tabla.querySelector("tbody");
+    function mostrarPagina(pagina) {
       tbody.innerHTML = "";
-      filas.forEach(f => tbody.appendChild(f));
+      const inicio = (pagina - 1) * filasPorPagina;
+      const fin = inicio + filasPorPagina;
+      const filasMostrar = todasLasFilas.slice(inicio, fin);
+      filasMostrar.forEach(f => tbody.appendChild(f));
+      generarPaginacion();
     }
 
-    function editarFila(boton) {
-      const fila = boton.parentNode.parentNode;
-      const celdas = fila.querySelectorAll("td");
-      for (let i = 0; i < celdas.length - 1; i++) {
-        const texto = celdas[i].innerText;
-        celdas[i].innerHTML = `<input value="${texto}" style='width: 100%; background-color: #2a2a2a; color: white; border: none; padding: 4px;'>`;
+    function generarPaginacion() {
+      const totalPaginas = Math.ceil(todasLasFilas.length / filasPorPagina);
+      const paginacion = document.getElementById("paginacion");
+      paginacion.innerHTML = "";
+      for (let i = 1; i <= totalPaginas; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.style.margin = "0 5px";
+        btn.onclick = () => {
+          paginaActual = i;
+          mostrarPagina(paginaActual);
+        };
+        if (i === paginaActual) {
+          btn.style.backgroundColor = "#3ae374";
+          btn.style.color = "black";
+        }
+        paginacion.appendChild(btn);
       }
-      boton.textContent = '💾';
-      boton.onclick = () => guardarEdicion(fila);
     }
 
-    function guardarEdicion(fila) {
-      const inputs = fila.querySelectorAll("input");
-      const valores = Array.from(inputs).map(input => input.value.trim());
-      const terminoClave = valores[0];
-
-      valores.forEach((valor, i) => {
-        fila.cells[i].innerText = valor;
+    function filtrarTabla() {
+      const filtro = document.getElementById("buscador").value.toLowerCase();
+      const filtradas = todasLasFilas.filter(fila => {
+        const texto = fila.cells[0].innerText.toLowerCase();
+        return texto.includes(filtro);
       });
-
-      fila.querySelector("button").textContent = '✏️';
-      fila.querySelector("button").onclick = () => editarFila(fila.querySelector("button"));
-
-      fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          actualizar: true,
-          termino: terminoClave,
-          traduccion: valores[1],
-          pronunciacion: valores[2],
-          categoria: valores[3],
-          definicion: valores[4],
-          sinonimos: valores[5],
-          tipo: valores[6],
-          formaFarmaceutica: valores[7]
-        })
-      })
-      .then(res => res.text())
-      .then(msg => {
-        const popup = document.getElementById("popupMsg");
-        popup.textContent = msg;
-        popup.style.display = "block";
-        setTimeout(() => popup.style.display = "none", 2000);
-      })
-      .catch(err => console.error('❌ Error al actualizar en Sheets:', err));
-    }
-
-    function eliminarFila(boton) {
-      const fila = boton.parentNode.parentNode;
-      const termino = fila.cells[0]?.innerText;
-      if (confirm("¿Seguro que deseas eliminar esta fila?")) {
-        fila.remove();
-        fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ eliminar: true, termino })
-        })
-        .then(res => res.text())
-        .then(msg => console.log('🗑️ Eliminado en Google Sheets:', msg))
-        .catch(err => console.error('❌ Error al eliminar en Sheets:', err));
-      }
+      tbody.innerHTML = "";
+      filtradas.forEach(f => tbody.appendChild(f));
     }
   </script>
-
-  <div id="popupMsg" style="display:none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #3ae374; color: black; padding: 12px 24px; border-radius: 10px; font-weight: bold; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">✅ Término actualizado</div>
 </body>
 </html>
