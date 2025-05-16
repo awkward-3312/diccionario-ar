@@ -132,7 +132,7 @@
           const entrada = data[clave];
           const fecha = entrada.Timestamp || '-';
           const nombre = entrada.Nombre || 'Anónimo';
-          const mensaje = entrada.Sugerencia || entrada.Mensaje || '-';
+          const mensaje = entrada.Mensaje || '-';
 
           const tr = document.createElement('tr');
           tr.innerHTML = `<td>${fecha}</td><td>${nombre}</td><td>${mensaje}</td>`;
