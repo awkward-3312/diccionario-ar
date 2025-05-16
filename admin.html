@@ -237,17 +237,55 @@
     }
 
     function generarPaginacion() {
-      const totalPaginas = Math.ceil(todasLasFilas.length / filasPorPagina);
-      const paginacion = document.getElementById("paginacion");
-      paginacion.innerHTML = "";
-      for (let i = 1; i <= totalPaginas; i++) {
-        const btn = document.createElement("button");
-        btn.textContent = i;
-        btn.style.margin = "0 5px";
-        btn.onclick = () => {
-          paginaActual = i;
-          mostrarPagina(paginaActual);
-        };
+  const totalPaginas = Math.ceil(todasLasFilas.length / filasPorPagina);
+  const paginacion = document.getElementById("paginacion");
+  paginacion.innerHTML = "";
+
+  const btnAnterior = document.createElement("button");
+  btnAnterior.innerHTML = "&lt;";
+  btnAnterior.disabled = paginaActual === 1;
+  btnAnterior.onclick = () => {
+    if (paginaActual > 1) {
+      paginaActual--;
+      mostrarPagina(paginaActual);
+    }
+  };
+  paginacion.appendChild(btnAnterior);
+
+  for (let i = 1; i <= totalPaginas; i++) {
+    if (i <= 3 || i === totalPaginas || Math.abs(i - paginaActual) <= 1) {
+      const btn = document.createElement("button");
+      btn.textContent = i;
+      btn.style.margin = "0 3px";
+      btn.onclick = () => {
+        paginaActual = i;
+        mostrarPagina(paginaActual);
+      };
+      if (i === paginaActual) {
+        btn.style.backgroundColor = "#3ae374";
+        btn.style.color = "black";
+      }
+      paginacion.appendChild(btn);
+    } else if (i === 4 && paginaActual > 5 || i === totalPaginas - 1 && paginaActual < totalPaginas - 3) {
+      const dots = document.createElement("span");
+      dots.textContent = "...";
+      dots.style.margin = "0 5px";
+      paginacion.appendChild(dots);
+      i = i < paginaActual ? paginaActual - 2 : totalPaginas - 1;
+    }
+  }
+
+  const btnSiguiente = document.createElement("button");
+  btnSiguiente.innerHTML = "&gt;";
+  btnSiguiente.disabled = paginaActual === totalPaginas;
+  btnSiguiente.onclick = () => {
+    if (paginaActual < totalPaginas) {
+      paginaActual++;
+      mostrarPagina(paginaActual);
+    }
+  };
+  paginacion.appendChild(btnSiguiente);
+};
         if (i === paginaActual) {
           btn.style.backgroundColor = "#3ae374";
           btn.style.color = "black";
